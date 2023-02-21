@@ -76,13 +76,13 @@ void DeckGUI::resized()
     playButton.setBounds(0, 0, getWidth() / 2, rowH);
     stopButton.setBounds(getWidth() / 2, 0, getWidth() / 2, rowH);
     //// Add the fader display (itisa pointer to the fader, so use '->' syntax here)
-    fader.setBounds(0, rowH, getWidth(), rowH);
-    volSlider.setBounds(0, rowH * 2, getWidth(), rowH);
-    speedSlider.setBounds(0, rowH * 3, getWidth(), rowH);
-    posSlider.setBounds(0, rowH * 4, getWidth(), rowH);
+    fader.setBounds(0, rowH, getWidth(), rowH * 3);
+    volSlider.setBounds(0, rowH * 4, getWidth(), rowH / 2);
+    speedSlider.setBounds(0, rowH * 4.5, getWidth(), rowH/2);
+    posSlider.setBounds(0, rowH * 5, getWidth(), rowH / 2);
     // WaveformDisplay should take up two rows (make height double the row height)
-    waveformDisplay.setBounds(0, rowH * 5, getWidth(), rowH * 2); // Takes up two rows in the display
-    loadButton.setBounds(0, rowH * 7, getWidth(), rowH);
+    waveformDisplay.setBounds(0, rowH * 5.5, getWidth(), rowH); // Takes up two rows in the display
+    loadButton.setBounds(0, rowH * 6.5, getWidth(), rowH / 2);
 }
 
 

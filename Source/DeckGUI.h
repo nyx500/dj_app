@@ -27,7 +27,6 @@ public:
     void resized() override;
 
 
-
     /** Implement button listener: always write override when using something from another class */
     void buttonClicked(juce::Button* button) override; // [2] Need to override the pure virtual function or it won't work
 
