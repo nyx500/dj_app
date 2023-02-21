@@ -67,6 +67,14 @@ void DJAudioPlayer::setGain(double gain)
         transportSource.setGain(gain);
     }
 }
+
+/** For the "fade" effect: returns the current volume of the audio*/
+double DJAudioPlayer::getGain()
+{
+   return transportSource.getGain();
+}
+
+
 void DJAudioPlayer::setSpeed(double ratio)
 {
     if (ratio < 0 || ratio > 100.0)

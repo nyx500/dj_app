@@ -19,6 +19,10 @@ public:
     // Basic sound altering functions
     void loadURL(juce::URL audioURL);
     void setGain(double gain);
+
+    /** For the "fade" effect: returns the current volume of the audio*/
+    double getGain();
+
     void setSpeed(double ratio);
     void setPosition(double posInSecs);
     // Relative means between '0 and 1' instead of between 0 and "number of seconds"

@@ -33,6 +33,21 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
+    /** Getter for fadeIn value: returns fadeIn bool value */
+    bool getFadeIn();
+
+    /** Getter for fadeOut value: returns fadeOut bool value */
+    bool getFadeOut();
+
+    /** Getter for fadeInMaxVol: returns the maximum volume 
+    the music should "fade in" to */
+    double getFadeInMaxVol();
+
+    /** Getter for fadeOutMinVol: returns the minimum volume to music should
+    "fade out" to */
+    double getFadeOutMinVol();
+
+
 private:
 
     juce::TextButton fadeInButton{ "Fade In" };
@@ -41,6 +56,12 @@ private:
 
     juce::Slider minVolumeSlider;
     juce::Slider maxVolumeSlider;
+
+    bool fadeIn = false;
+    bool fadeOut = false;
+
+    double fadeInMaxVol = 0.1;
+    double fadeOutMinVol = 0.9;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Fader)
 };

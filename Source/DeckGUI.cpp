@@ -127,8 +127,12 @@ void DeckGUI::sliderValueChanged(juce::Slider* slider)
 {
 
     if (slider == &volSlider)
-    {
-        player->setGain(slider->getValue());
+    {   
+        // Only use the Volume Slider to adjust the volume if "Fade" is turned OFF
+        if (!fader.getFadeIn() && !fader.getFadeOut())
+        {
+            player->setGain(slider->getValue());
+        }
     }
 
     if (slider == &speedSlider)
@@ -170,4 +174,36 @@ void DeckGUI::filesDropped(const juce::StringArray& files, int x, int y)
 void DeckGUI::timerCallback()
 {
     waveformDisplay.setPositionRelative(player->getPositionRelative());
+
+    // Implementing the functionality for the "fade" effect...
+    // Get the fadeIn boolean from Fader component
+    if (fader.getFadeIn())
+    {   
+        DBG("getFadeIn is being called!");
+
+        // Get the current maxLimit for how loud the song should fade into
+        // from the Fader class
+        double maxLimit = fader.getFadeInMaxVol();
+
+        DBG("Max limit:");
+        DBG(maxLimit);
+
+        // Get the current volume of the song being played from audioTransportSource
+        double currentVolume = player->getGain();
+
+        DBG("Current volume:");
+        DBG(currentVolume);
+
+        // If the volume is not yet at the fader-determined limit, increase it
+        // Stop setting the gain if the maxLimit is reached
+        if (currentVolume < maxLimit)
+        {   
+            player->setGain(currentVolume + 0.0005);
+        }
+    }   
+
+    if (fader.getFadeOut())
+    {
+        DBG(fader.getFadeOutMinVol());
+    }
 }
