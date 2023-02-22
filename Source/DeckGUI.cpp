@@ -198,12 +198,31 @@ void DeckGUI::timerCallback()
         // Stop setting the gain if the maxLimit is reached
         if (currentVolume < maxLimit)
         {   
-            player->setGain(currentVolume + 0.0005);
+            player->setGain(currentVolume + 0.001);
         }
     }   
 
     if (fader.getFadeOut())
-    {
-        DBG(fader.getFadeOutMinVol());
+    {   
+        DBG("getFadeOut is being called!");
+
+        // Get the current minLimit for how loud the song should fade out, get
+        // from the Fader class
+        double minLimit = fader.getFadeOutMinVol();
+
+        // Get the current volume of the song being played from audioTransportSource
+        double currentVolume = player->getGain();
+
+        DBG("Current volume:");
+        DBG(currentVolume);
+
+        // If the volume is not yet at the fader-determined limit, decrease it
+       // Stop setting the gain if the minLimit is reached
+        if (currentVolume > minLimit)
+        {
+            player->setGain(currentVolume - 0.001);
+            DBG("Current volume after adapting:");
+            DBG(player->getGain());
+        }
     }
 }
