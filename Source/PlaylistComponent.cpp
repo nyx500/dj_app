@@ -6,6 +6,21 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2):
     gui1(_gui1),
     gui2(_gui2)
 {
+    (juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" })).setAsCurrentWorkingDirectory();
+
+    if (!juce::File::getCurrentWorkingDirectory().getChildFile("urls.xml").exists())
+    {
+        urlsFile = juce::File::getCurrentWorkingDirectory().getChildFile("urls.xml");
+        urlsFile.create();
+    }
+    else
+    {
+        DBG("PlaylistComponent::File already exists");
+        urlsFile = juce::File::getCurrentWorkingDirectory().getChildFile("urls.xml");
+        DBG(urlsFile.getFileName().toStdString());
+    }
+
+
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 

@@ -83,6 +83,9 @@ private:
     DeckGUI* gui1;
     DeckGUI* gui2;
 
+    // Stores the URLs of the songs
+    juce::File urlsFile;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 
 };
