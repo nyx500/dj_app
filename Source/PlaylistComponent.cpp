@@ -2,20 +2,24 @@
 #include "PlaylistComponent.h"
 
 //==============================================================================
-PlaylistComponent::PlaylistComponent()
+PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2):
+    gui1(_gui1),
+    gui2(_gui2)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 
-
     // getHeader() returns another kind of component called a Header (look up implementation!)
     // addColumn() function is really gnarly --> but many args are default apart from columnName, columnId, width (first 3 args)
     // ColumnId cannot be 0 in Juce 6
-    tableComponent.getHeader().addColumn("Track Title", 1, 400);
+    tableComponent.getHeader().addColumn("Track Title", 1, 300);
     // Add Column for track duration
     tableComponent.getHeader().addColumn("Track Duration", 2, 200);
-    // Play button column
-    tableComponent.getHeader().addColumn("", 3, 200);
+    // Play in DeckGUI1 button column
+    tableComponent.getHeader().addColumn("", 3, 100);
+    // Play in DeckGUI2 button column
+    tableComponent.getHeader().addColumn("", 4, 100);
+    
 
     // Delete this for now until we add a track class
     //tableComponent.getHeader().addColumn("Artist", 2, 400);
@@ -104,10 +108,22 @@ void PlaylistComponent::paintCell(juce::Graphics& g,
     // Documentation: 
     // void 	drawText (const String &text, int x, int y, int width, int height, Justification justificationType, bool useEllipsesIfTooBig=true) const
     // Draws a line of text within a specified rectangle.
-    g.drawText(tracks[rowNumber].title,
-        2, 0, width - 4, height,
-        juce::Justification::centredLeft,
-        true);
+
+    if (columnId == 1)
+    {
+        g.drawText(tracks[rowNumber].title,
+            2, 0, width - 4, height,
+            juce::Justification::centredLeft,
+             true);
+    }
+
+    if (columnId == 2)
+    {
+        g.drawText(tracks[rowNumber].duration,
+            2, 0, width - 4, height,
+            juce::Justification::centredLeft,
+            true);
+    }
 }
 
 // Virtual (not pure virtual) method to implement button in a cell
@@ -123,9 +139,26 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
         if (existingComponentToUpdate == nullptr)
         {
             // Create the component
-            juce::TextButton* btn = new juce::TextButton{ "Play" };
+            juce::TextButton* btn = new juce::TextButton{ "Play in Deck 1" };
 
-            juce::String id{ std::to_string(rowNumber) };
+            // Make the button id rowNumber:columnId, so for row 4, column 3, will be string 4:3
+            juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId)};
+            btn->setComponentID(id);
+
+            btn->addListener(this);
+            existingComponentToUpdate = btn;
+        }
+    }
+    // If the columnId is that for the play button (equals 2)
+    if (columnId == 4)
+    {
+        // If pointer to existingComponent is a nullptr (no component has been created yet)
+        if (existingComponentToUpdate == nullptr)
+        {
+            // Create the component
+            juce::TextButton* btn = new juce::TextButton{ "Play in Deck 2" };
+
+            juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId) };
             btn->setComponentID(id);
 
             btn->addListener(this);
@@ -154,6 +187,8 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
             {
                 auto chosenFile = chooser.getResult();
 
+             
+
                 // Stores the string showing duration of the track
                 std::string trackLength = "";
 
@@ -165,6 +200,7 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
                     double lengthInSeconds = reader->lengthInSamples / reader->sampleRate;
 
                     // Attribution for time conversion: https://stackoverflow.com/questions/25696992/converting-seconds-to-hours-and-minutes-and-seconds
+                    // Convert seconds into HH:MM::SS format
                     int roundedSeconds = (int)std::round(lengthInSeconds);
                     int minutes = roundedSeconds / 60;
                     int secondsRemaining = roundedSeconds % 60;
@@ -189,12 +225,20 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
                         secondsString = "0" + secondsString;
                     }
 
+                    // Store track length as a string
                     trackLength = trackLength + hoursString + ":" + minutesString + ":" + secondsString;
 
-                    DBG(trackLength);
                 }
 
+                // Get the absolute path of the file as a string
+                std::string filePath = chosenFile.getFullPathName().toStdString();
+
+                // Taglib file:
+                // Construct a File object and opens the file.file should be a be a C - string in the local file system encoding.
+                // Attribution: https://taglib.org/api/classTagLib_1_1File.html
+                // Change filepath to a c-string
                 
+
                 // Add the new track to the list of tracks
                 tracks.push_back(Track{
                 juce::URL{ chosenFile },

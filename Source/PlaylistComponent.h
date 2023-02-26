@@ -4,6 +4,8 @@
 #include<vector>
 #include <string>
 #include "Track.h"
+#include "DeckGUI.h"
+
 
 //==============================================================================
 /*
@@ -15,11 +17,17 @@ class PlaylistComponent : public juce::Component,
     public juce::FileDragAndDropTarget
 {
 public:
-    PlaylistComponent();
+    PlaylistComponent(
+        DeckGUI* _gui1,
+        DeckGUI* _gui2
+        );
+
     ~PlaylistComponent() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
+
+    
 
     // Basic inheritance pattern
     // Minimum implementation of pure virtual functions in juce::TableListBoxModel
@@ -69,6 +77,12 @@ private:
     juce::AudioFormatManager formatManager;
 
     std::vector<Track> tracks;
+
+    // Pass pointers to the 2 DeckGUI elements into the PlaylistComponent, so that the chosen song is played
+    // when the user clicks 'play' on it
+    DeckGUI* gui1;
+    DeckGUI* gui2;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 
 };
