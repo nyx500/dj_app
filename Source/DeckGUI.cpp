@@ -114,6 +114,13 @@ void DeckGUI::buttonClicked(juce::Button* button)
         fChooser.launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser)
             {
                 auto chosenFile = chooser.getResult();
+
+                // Gets the filename as a Juce String
+                juce::String fileNameAsJuceString = chosenFile.getFileName();
+                // Gets the filename as a std string
+                std::string fileName = fileNameAsJuceString.toStdString();
+                DBG(fileName);
+
                 /* Loads URL into the player using the loadURL method */
                 player->loadURL(juce::URL{ chosenFile });
                 /** Does the same on the waveformDisplay, except it's not a pointer */
@@ -165,7 +172,6 @@ void DeckGUI::filesDropped(const juce::StringArray& files, int x, int y)
     // Only want one file
     if (files.size() == 1)
     {
-
         // Convert a string filename into a file then into a URL
         player->loadURL(juce::URL{ juce::File{files[0]} });
     }

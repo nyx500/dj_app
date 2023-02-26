@@ -3,13 +3,16 @@
 #include <JuceHeader.h>
 #include<vector>
 #include <string>
+#include "Track.h"
 
 //==============================================================================
 /*
 */
 class PlaylistComponent : public juce::Component,
     public juce::TableListBoxModel,
-    public juce::Button::Listener
+    public juce::Button::Listener,
+    // Enables adding of files through drag-and-drop
+    public juce::FileDragAndDropTarget
 {
 public:
     PlaylistComponent();
@@ -43,11 +46,29 @@ public:
 
     void buttonClicked(juce::Button* button) override;
 
+    // Drag and drop functions
+    bool isInterestedInFileDrag(const juce::StringArray& iles) override;
+    void filesDropped(const juce::StringArray& files, int x, int y) override;
+
 
 private:
+    
+    // Button to add a track to the playlist table
+    juce::TextButton addButton{ "ADD NEW TRACK" };
 
     juce::TableListBox tableComponent;
 
-    std::vector<std::string> trackTitles;
+    // Make a file chooser in order to add files to the playlist
+    // https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
+    juce::FileChooser fChooser{ "Select a file..." };
+
+    // Create a format manager for the PlaylistComponent (outside the main deckGUI component
+    // as there is only one playlistComponent for an app and 2 DeckGUIs!) as it cannot access
+    // the one inside the DJAudioPlayer in order to get the length/duration of a track
+    // and therefore store this data in the track object
+    juce::AudioFormatManager formatManager;
+
+    std::vector<Track> tracks;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
+
 };
