@@ -40,12 +40,14 @@ public:
     // Implement juce::Timer pure virtual function
     void timerCallback() override;
 
+    /** A file URL is passed in from the Playlist Component and loaded into the DJAudioplayer */
+    void loadTrack(juce::URL chosenFile);
+
 
 private:
     // Your private member variables go here...
     juce::TextButton playButton{ "PLAY" };
     juce::TextButton stopButton{ "STOP" };
-    juce::TextButton loadButton{ "LOAD" };
 
     juce::Slider volSlider;
     juce::Slider speedSlider;

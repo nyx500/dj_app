@@ -13,7 +13,6 @@ waveformDisplay(formatManagerToUse, cacheToUse)
     // initialise any special settings that your component needs.
     addAndMakeVisible(playButton);
     addAndMakeVisible(stopButton);
-    addAndMakeVisible(loadButton);
 
     addAndMakeVisible(volSlider);
     addAndMakeVisible(speedSlider);
@@ -27,7 +26,6 @@ waveformDisplay(formatManagerToUse, cacheToUse)
     // Add the Deck GUI as a listener to its own buttons
     playButton.addListener(this);
     stopButton.addListener(this);
-    loadButton.addListener(this);
     volSlider.addListener(this);
     speedSlider.addListener(this);
     posSlider.addListener(this);
@@ -82,7 +80,6 @@ void DeckGUI::resized()
     posSlider.setBounds(0, rowH * 5, getWidth(), rowH / 2);
     // WaveformDisplay should take up two rows (make height double the row height)
     waveformDisplay.setBounds(0, rowH * 5.5, getWidth(), rowH); // Takes up two rows in the display
-    loadButton.setBounds(0, rowH * 6.5, getWidth(), rowH / 2);
 }
 
 
@@ -99,34 +96,6 @@ void DeckGUI::buttonClicked(juce::Button* button)
         std::cout << "Stop button was clicked " << std::endl;
         player->stop();
 
-    }
-    if (button == &loadButton)
-    {
-
-        // this does work in 6.1 but the syntax is quite counter-intuitive
-        // Link: https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
-        // - configure the dialogue
-        auto fileChooserFlags =
-            juce::FileBrowserComponent::canSelectFiles;
-        // - launch out of the main thread
-        // - note how we use a lambda function which you've probably
-        // not seen before. Please do not worry too much about that. 
-        fChooser.launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser)
-            {
-                auto chosenFile = chooser.getResult();
-
-                // Gets the filename as a Juce String
-                juce::String fileNameAsJuceString = chosenFile.getFileName();
-                // Gets the filename as a std string
-                std::string fileName = fileNameAsJuceString.toStdString();
-                DBG(fileName);
-
-                /* Loads URL into the player using the loadURL method */
-                player->loadURL(juce::URL{ chosenFile });
-                /** Does the same on the waveformDisplay, except it's not a pointer */
-                waveformDisplay.loadURL(juce::URL{ chosenFile });
-                waveformDisplay.setTrackLengthInSeconds(player->getTrackLengthInSeconds());
-            });
     }
 }
 
@@ -215,6 +184,7 @@ void DeckGUI::timerCallback()
         // Get the current minLimit for how loud the song should fade out, get
         // from the Fader class
         double minLimit = fader.getFadeOutMinVol();
+        DBG(minLimit);
 
         // Get the current volume of the song being played from audioTransportSource
         double currentVolume = player->getGain();
@@ -231,4 +201,39 @@ void DeckGUI::timerCallback()
             DBG(player->getGain());
         }
     }
+}
+
+
+/** A file URL is passed in from the Playlist Component and loaded into the DJAudioplayer */
+void DeckGUI::loadTrack(juce::URL chosenFile)
+{
+    //// this does work in 6.1 but the syntax is quite counter-intuitive
+    //   // Link: https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
+    //   // - configure the dialogue
+    //auto fileChooserFlags =
+    //    juce::FileBrowserComponent::canSelectFiles;
+    //// - launch out of the main thread
+    //// - note how we use a lambda function which you've probably
+    //// not seen before. Please do not worry too much about that. 
+    //fChooser.launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser)
+    //    {
+    //        auto chosenFile = chooser.getResult();
+
+    //        // Gets the filename as a Juce String
+    //        juce::String fileNameAsJuceString = chosenFile.getFileName();
+    //        // Gets the filename as a std string
+    //        std::string fileName = fileNameAsJuceString.toStdString();
+    //        DBG(fileName);
+
+    //        /* Loads URL into the player using the loadURL method */
+    //        player->loadURL(juce::URL{ chosenFile });
+    //        /** Does the same on the waveformDisplay, except it's not a pointer */
+    //        waveformDisplay.loadURL(juce::URL{ chosenFile });
+    //        waveformDisplay.setTrackLengthInSeconds(player->getTrackLengthInSeconds());
+    //    });
+     /* Loads URL into the player using the loadURL method */
+    player->loadURL(chosenFile);
+    /** Does the same on the waveformDisplay, except it's not a pointer */
+    waveformDisplay.loadURL(chosenFile);
+    waveformDisplay.setTrackLengthInSeconds(player->getTrackLengthInSeconds());
 }

@@ -154,10 +154,11 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
         if (existingComponentToUpdate == nullptr)
         {
             // Create the component
-            juce::TextButton* btn = new juce::TextButton{ "Play in Deck 1" };
+            juce::TextButton* btn = new juce::TextButton{ "Load into Deck 1" };
 
             // Make the button id rowNumber:columnId, so for row 4, column 3, will be string 4:3
             juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId)};
+            DBG(id.toStdString());
             btn->setComponentID(id);
 
             btn->addListener(this);
@@ -171,7 +172,7 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
         if (existingComponentToUpdate == nullptr)
         {
             // Create the component
-            juce::TextButton* btn = new juce::TextButton{ "Play in Deck 2" };
+            juce::TextButton* btn = new juce::TextButton{ "Load into Deck 2" };
 
             juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId) };
             btn->setComponentID(id);
@@ -190,7 +191,6 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
     // If add track button is clicked...
     if (button == &addButton)
     {
-        DBG("add button was clicked!!!!!!");
         // this does work in 6.1 but the syntax is quite counter-intuitive
         // Link: https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
         // - configure the dialogue
@@ -202,11 +202,10 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
             {
                 auto chosenFile = chooser.getResult();
 
-             
-
                 // Stores the string showing duration of the track
                 std::string trackLength = "";
 
+                // TODO: put this in a separate helper function
                 // Gets the duration of the audio track
                 // Attribution: https://forum.juce.com/t/get-track-length-before-it-starts-playing/44838
                 // Read the audio file using formatManager to get its length in seconds
@@ -246,7 +245,7 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
                 }
 
                 // Get the absolute path of the file as a string
-                std::string filePath = chosenFile.getFullPathName().toStdString();
+                    std::string filePath = chosenFile.getFullPathName().toStdString();
 
                 // Taglib file:
                 // Construct a File object and opens the file.file should be a be a C - string in the local file system encoding.
@@ -272,9 +271,33 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
     else
     {
         // Converts JUCE String to std::string and then to integer
-        int id = std::stoi(button->getComponentID().toStdString());
-        DBG("PlaylistComponent::buttonClicked - trackTitle: ");
-        DBG(tracks[id].title);
+        std::string id = button->getComponentID().toStdString();
+
+        // TODO: put this in a separate helper function
+        // How to get substring before a certain char (the row-index/track-index in this case)
+        // Attribution: https://stackoverflow.com/questions/15006269/c-get-substring-before-a-certain-char
+        std::string trackId;
+        std::string::size_type index = id.find(':');
+        if (index != std::string::npos)
+        {
+            trackId = id.substr(0, index);
+        }
+        // Get the substring following the ':' (deck id)
+        // Attribution: https://stackoverflow.com/questions/28163723/c-how-to-get-substring-after-a-character
+        std::string deckId = id.substr(id.find(':') + 1);
+        
+        // Conver trackId to an integer, so that it can be used as an index
+        int trackIndex = std::stoi(trackId);
+        // Convert column/deckGui id to int and load url into that GUI's DJAudioPlayer
+        if (std::stoi(deckId) == 3)
+        {   
+            int trackIndex = std::stoi(trackId);
+            gui1->loadTrack(tracks[trackIndex].url);
+        }
+        else
+        {
+            gui2->loadTrack(tracks[trackIndex].url);
+        }
     }
 
 }
