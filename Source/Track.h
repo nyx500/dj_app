@@ -17,13 +17,20 @@ class Track {
         Track(
             juce::URL _url,
             std::string _title,
-            std::string _artist,
-            std::string _duration
+            std::string _duration,
+            std::string _filePath
         );
         ~Track();
 
+        // Getters for the data members
+        juce::URL getUrl();
+        std::string getTitle();
+        std::string getDuration();
+        std::string getFilePath();
+
+    private:
         juce::URL url;
         std::string title;
-        std::string artist;
         std::string duration;
+        std::string filePath;
 };

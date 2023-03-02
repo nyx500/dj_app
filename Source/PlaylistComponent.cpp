@@ -2,27 +2,18 @@
 #include "PlaylistComponent.h"
 
 //==============================================================================
-PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2):
+PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     gui1(_gui1),
     gui2(_gui2)
 {
-    (juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" })).setAsCurrentWorkingDirectory();
 
-    if (!juce::File::getCurrentWorkingDirectory().getChildFile("urls.xml").exists())
-    {
-        urlsFile = juce::File::getCurrentWorkingDirectory().getChildFile("urls.xml");
-        urlsFile.create();
-    }
-    else
-    {
-        DBG("PlaylistComponent::File already exists");
-        urlsFile = juce::File::getCurrentWorkingDirectory().getChildFile("urls.xml");
-        DBG(urlsFile.getFileName().toStdString());
-    }
+    // Gets the URL a file storing the URLs of the songs (creates a file if one does not exist)
+    // Stores the URL in private data member "storageFileURL"
+    fullPathToFile = CreateOrLoadTrackURLsFile();
 
+    readFile(fullPathToFile);
 
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
+    //parseExistingXMLFile(fullPathToFile);
 
     // getHeader() returns another kind of component called a Header (look up implementation!)
     // addColumn() function is really gnarly --> but many args are default apart from columnName, columnId, width (first 3 args)
@@ -35,10 +26,6 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2):
     // Play in DeckGUI2 button column
     tableComponent.getHeader().addColumn("", 4, 100);
     
-
-    // Delete this for now until we add a track class
-    //tableComponent.getHeader().addColumn("Artist", 2, 400);
-
     // Add the data (model) to the tableComponent
     // This class inherits from .: IS the model, so use "this"
     tableComponent.setModel(this);
@@ -53,6 +40,7 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2):
     formatManager.registerBasicFormats();
 }
 
+// Destructor: release memory and reset pointers
 PlaylistComponent::~PlaylistComponent()
 {
 }
@@ -126,7 +114,7 @@ void PlaylistComponent::paintCell(juce::Graphics& g,
 
     if (columnId == 1)
     {
-        g.drawText(tracks[rowNumber].title,
+        g.drawText(tracks[rowNumber].getTitle(),
             2, 0, width - 4, height,
             juce::Justification::centredLeft,
              true);
@@ -134,7 +122,7 @@ void PlaylistComponent::paintCell(juce::Graphics& g,
 
     if (columnId == 2)
     {
-        g.drawText(tracks[rowNumber].duration,
+        g.drawText(tracks[rowNumber].getDuration(),
             2, 0, width - 4, height,
             juce::Justification::centredLeft,
             true);
@@ -158,7 +146,6 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
 
             // Make the button id rowNumber:columnId, so for row 4, column 3, will be string 4:3
             juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId)};
-            DBG(id.toStdString());
             btn->setComponentID(id);
 
             btn->addListener(this);
@@ -202,64 +189,45 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
             {
                 auto chosenFile = chooser.getResult();
 
-                // Stores the string showing duration of the track
-                std::string trackLength = "";
+                std::string trackLengthInHHMMSSFormat = "";
 
-                // TODO: put this in a separate helper function
                 // Gets the duration of the audio track
                 // Attribution: https://forum.juce.com/t/get-track-length-before-it-starts-playing/44838
                 // Read the audio file using formatManager to get its length in seconds
                 if (auto reader = formatManager.createReaderFor(chosenFile))
                 {
                     double lengthInSeconds = reader->lengthInSamples / reader->sampleRate;
-
-                    // Attribution for time conversion: https://stackoverflow.com/questions/25696992/converting-seconds-to-hours-and-minutes-and-seconds
-                    // Convert seconds into HH:MM::SS format
-                    int roundedSeconds = (int)std::round(lengthInSeconds);
-                    int minutes = roundedSeconds / 60;
-                    int secondsRemaining = roundedSeconds % 60;
-                    int hours = minutes / 60;
-                    minutes = minutes % 60;
-
-                    // Logic to make hours into '00' instead of '0' if the value is 0, 1, 2 etc + do the same for mins and secs
-                    // TODO: put all this in a separate function
-                    std::string hoursString = std::to_string(hours);
-                    std::string minutesString= std::to_string(minutes);
-                    std::string secondsString = std::to_string(secondsRemaining);
-                    if (hours < 10)
-                    {
-                        hoursString = "0" + hoursString;
-                    }
-                    if (minutes < 10)
-                    {
-                        minutesString = "0" + minutesString;
-                    }
-                    if (secondsRemaining < 10)
-                    {
-                        secondsString = "0" + secondsString;
-                    }
-
-                    // Store track length as a string
-                    trackLength = trackLength + hoursString + ":" + minutesString + ":" + secondsString;
-
+                    trackLengthInHHMMSSFormat = convertTimeInSecondsToString(lengthInSeconds);
                 }
 
                 // Get the absolute path of the file as a string
-                    std::string filePath = chosenFile.getFullPathName().toStdString();
+                // TODO: get just the name without the extension/format at the end
+                std::string filePath = chosenFile.getFullPathName().toStdString();
 
-                // Taglib file:
-                // Construct a File object and opens the file.file should be a be a C - string in the local file system encoding.
-                // Attribution: https://taglib.org/api/classTagLib_1_1File.html
-                // Change filepath to a c-string
-                
 
                 // Add the new track to the list of tracks
                 tracks.push_back(Track{
                 juce::URL{ chosenFile },
                     chosenFile.getFileName().toStdString(),
-                    "",
-                    trackLength
+                     trackLengthInHHMMSSFormat,
+                     filePath
                 });
+
+                juce::File targetFile = juce::File(juce::String(fullPathToFile));
+
+                juce::FileOutputStream stream(targetFile);
+
+                if (stream.openedOk())
+                {   
+                    // Overwrite the file by executing the next two commands
+                    stream.setPosition(0);
+                    stream.truncate();
+
+                    for (int i = 0; i < tracks.size(); ++i)
+                    {
+                        stream.writeString(juce::String(tracks[i].getFilePath()));
+                    }
+                }
 
                 // Updates and repaints the table component when a new track is added
                 // Attribution: https://forum.juce.com/t/tablelistboxmodel-and-repaint/4915/2
@@ -292,11 +260,11 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
         if (std::stoi(deckId) == 3)
         {   
             int trackIndex = std::stoi(trackId);
-            gui1->loadTrack(tracks[trackIndex].url);
+            gui1->loadTrack(tracks[trackIndex].getUrl());
         }
         else
         {
-            gui2->loadTrack(tracks[trackIndex].url);
+            gui2->loadTrack(tracks[trackIndex].getUrl());
         }
     }
 
@@ -306,13 +274,11 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
 // Drag and drop functions
 bool PlaylistComponent::isInterestedInFileDrag(const juce::StringArray& files)
 {
-    DBG("PlaylistComponent::isInterestedInFileDrag");
     return true;
 }
 
 void PlaylistComponent::filesDropped(const juce::StringArray& files, int x, int y)
 {
-    DBG("PlaylistComponent::filesDropped");
 
     // Make sure user only adds one file (at least for now)
     if (files.size() == 1)
@@ -324,6 +290,94 @@ void PlaylistComponent::filesDropped(const juce::StringArray& files, int x, int 
         juce::String fileURLJS = fileURL.toString(false);
         std::string fileURLString = fileURLJS.toStdString();
 
-        DBG(fileURLString);
     }
+}
+
+
+/** Creates a file (if one does not already exist) in the Current Working Directory.
+    * Returns the full path to that file.
+*/
+std::string PlaylistComponent::CreateOrLoadTrackURLsFile()
+{   
+    // Sets the Source folder this code is in to the Current Working Directory
+    (juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" })).setAsCurrentWorkingDirectory();
+
+    // Checks if file already exists, if so, load its path and return it
+    if (!juce::File::getCurrentWorkingDirectory().getChildFile("songUrls.txt").existsAsFile())
+    {   
+        // Set the private member file called "urlsFile" to a new file in the Current Working Directory and create the file
+        juce::File urlsFile = juce::File::getCurrentWorkingDirectory().getChildFile("songUrls.txt");
+        urlsFile.create();
+        return urlsFile.getFullPathName().toStdString();
+    }
+    else
+    {   
+        // If the file already exists because this application has already been opened, store the file in the "urlsFile" private data member
+        DBG("PlaylistComponent::File already exists");
+        juce::File urlsFile = juce::File::getCurrentWorkingDirectory().getChildFile("songUrls.txt");
+        return urlsFile.getFullPathName().toStdString();
+    }
+}
+
+
+/** Helper method converting the duration of the track length in seconds to a string in HH::MM::SS format
+    * Returns the HH::MM::SS string
+*/
+std::string PlaylistComponent::convertTimeInSecondsToString(double lengthInSeconds)
+{
+    // Stores the string showing duration of the track
+    std::string trackLength = "";
+
+    // Attribution for time conversion: https://stackoverflow.com/questions/25696992/converting-seconds-to-hours-and-minutes-and-seconds
+    // Converts seconds into HH:MM::SS format
+    int roundedSeconds = (int)std::round(lengthInSeconds);
+    int minutes = roundedSeconds / 60;
+    int secondsRemaining = roundedSeconds % 60;
+    int hours = minutes / 60;
+    minutes = minutes % 60;
+
+    // Logic to make hours into '00' instead of '0' if the value is 0, 1, 2 etc + do the same for mins and secs
+    std::string hoursString = std::to_string(hours);
+    std::string minutesString = std::to_string(minutes);
+    std::string secondsString = std::to_string(secondsRemaining);
+
+    // Prepend the hours/mins/secs with '0' if the time is just one digit (e.g. 7:3:56 get converted to 07:03:56)
+    if (hours < 10)
+    {
+        hoursString = "0" + hoursString;
+    }
+    if (minutes < 10)
+    {
+        minutesString = "0" + minutesString;
+    }
+    if (secondsRemaining < 10)
+    {
+        secondsString = "0" + secondsString;
+    }
+
+    // Store track length as a string
+    trackLength = trackLength + hoursString + ":" + minutesString + ":" + secondsString;
+
+    return trackLength;
+}
+
+
+void PlaylistComponent::readFile(std::string path) {
+
+    juce::File myFile = juce::File(juce::String(path));
+
+    if (myFile.exists())
+    {
+        juce::FileInputStream stream(myFile);
+
+        if (stream.openedOk())
+        {
+            while (!stream.isExhausted())
+            {
+                std::string myString = stream.readString().toStdString();
+                DBG("readString: " + myString);
+            }
+        }
+    }
+
 }

@@ -58,9 +58,21 @@ public:
     bool isInterestedInFileDrag(const juce::StringArray& iles) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
 
+    /** Creates a file (if one does not already exist) in the Current Working Directory.
+        * Returns the full path to that file.
+    */
+    std::string CreateOrLoadTrackURLsFile();
+
+    void readFile(std::string path);
+
 
 private:
     
+    /** Helper method converting the duration of the track length in seconds to a string in HH::MM::SS format
+        * Returns the HH::MM::SS string
+    */
+    std::string convertTimeInSecondsToString(double timeInSeconds);
+
     // Button to add a track to the playlist table
     juce::TextButton addButton{ "ADD NEW TRACK" };
 
@@ -83,8 +95,8 @@ private:
     DeckGUI* gui1;
     DeckGUI* gui2;
 
-    // Stores the URLs of the songs
-    juce::File urlsFile;
+    // Full path to the file storing track data
+    std::string fullPathToFile;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 

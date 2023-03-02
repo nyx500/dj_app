@@ -12,15 +12,33 @@
 Track::Track(
     juce::URL _url,
     std::string _title,
-    std::string _artist,
-    std::string _duration
+    std::string _duration,
+    std::string _filePath
 ) : url(_url),
 title(_title),
-artist(_artist),
-duration(_duration)
+duration(_duration),
+filePath(_filePath)
 {
 }
 
 Track::~Track() {
 
+}
+
+// Getters for the data members
+juce::URL Track::getUrl()
+{
+    return url;
+}
+std::string Track::getTitle()
+{
+    return title;
+}
+std::string Track::getDuration()
+{
+    return duration;
+}
+std::string Track::getFilePath()
+{
+    return filePath;
 }
