@@ -5,6 +5,7 @@
 #include <string>
 #include "Track.h"
 #include "DeckGUI.h"
+#include "CSVHelper.h"
 
 
 //==============================================================================
@@ -20,14 +21,14 @@ public:
     PlaylistComponent(
         DeckGUI* _gui1,
         DeckGUI* _gui2
-        );
+    );
 
     ~PlaylistComponent() override;
 
     void paint(juce::Graphics&) override;
     void resized() override;
 
-    
+
 
     // Basic inheritance pattern
     // Minimum implementation of pure virtual functions in juce::TableListBoxModel
@@ -47,7 +48,7 @@ public:
         bool rowIsSelected) override;
 
     // Virtual (not pure virtual) method to implement button in a cell
-    juce::Component* refreshComponentForCell(int rowNumber,
+    juce::Component* refreshComponentForCell(int rowNumber, 
         int columnId,
         bool isRowSelected,
         juce::Component* existingComponentToUpdate) override;
@@ -58,16 +59,11 @@ public:
     bool isInterestedInFileDrag(const juce::StringArray& iles) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
 
-    /** Creates a file (if one does not already exist) in the Current Working Directory.
-        * Returns the full path to that file.
-    */
-    std::string CreateOrLoadTrackURLsFile();
-
     void readFile(std::string path);
 
 
 private:
-    
+
     /** Helper method converting the duration of the track length in seconds to a string in HH::MM::SS format
         * Returns the HH::MM::SS string
     */
@@ -98,6 +94,10 @@ private:
     // Full path to the file storing track data
     std::string fullPathToFile;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
+    /** A CSV Helper instance which stores, reads from, writes to and generally parses data to / from a
+    * CSV tracksData file that stores the data for the loaded tracks
+    */
+    CSVHelper csvHelper;
 
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };

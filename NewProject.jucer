@@ -26,6 +26,8 @@
       <FILE id="DoKZiQ" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
     </GROUP>
+    <FILE id="NFy51V" name="CSVHelper.cpp" compile="1" resource="0" file="Source/CSVHelper.cpp"/>
+    <FILE id="SBsKtN" name="CSVHelper.h" compile="0" resource="0" file="Source/CSVHelper.h"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>

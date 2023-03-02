@@ -77,11 +77,11 @@ void MainComponent::paint(juce::Graphics& g)
 void MainComponent::resized()
 {
     // deckGUIs must take up half the height
-    deckGUI1.setBounds(0, 0, getWidth() / 2, getHeight() * 3 / 4);
-    deckGUI2.setBounds(getWidth() / 2, 0, getWidth() / 2, getHeight() * 3 / 4);
+    deckGUI1.setBounds(0, 0, getWidth() / 2, getHeight() / 2);
+    deckGUI2.setBounds(getWidth() / 2, 0, getWidth() / 2, getHeight() / 2);
 
     // Playlist on bottom half of the app
-    playlistComponent.setBounds(0, getHeight() * 3 / 4, getWidth(), getHeight() / 4);
+    playlistComponent.setBounds(0, getHeight() / 2, getWidth(), getHeight() / 2);
 
 
 }

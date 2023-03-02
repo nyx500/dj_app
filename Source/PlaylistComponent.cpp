@@ -6,25 +6,26 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     gui1(_gui1),
     gui2(_gui2)
 {
+    // Initialize the CSVHelper member (creates/loads a CSV file loading the track data from disk)
+    csvHelper = CSVHelper();
 
-    // Gets the URL a file storing the URLs of the songs (creates a file if one does not exist)
-    // Stores the URL in private data member "storageFileURL"
-    fullPathToFile = CreateOrLoadTrackURLsFile();
+    // Read tracks stored in file (if any)
+    tracks = csvHelper.readTracksDataFromCSVFile();
 
-    readFile(fullPathToFile);
-
-    //parseExistingXMLFile(fullPathToFile);
+    //readFile(fullPathToFile);
 
     // getHeader() returns another kind of component called a Header (look up implementation!)
     // addColumn() function is really gnarly --> but many args are default apart from columnName, columnId, width (first 3 args)
     // ColumnId cannot be 0 in Juce 6
     tableComponent.getHeader().addColumn("Track Title", 1, 300);
     // Add Column for track duration
-    tableComponent.getHeader().addColumn("Track Duration", 2, 200);
-    // Play in DeckGUI1 button column
+    tableComponent.getHeader().addColumn("Track Duration", 2, 60);
+    // Column storing "remove track" buttons
     tableComponent.getHeader().addColumn("", 3, 100);
-    // Play in DeckGUI2 button column
+    // Play in DeckGUI1 button column
     tableComponent.getHeader().addColumn("", 4, 100);
+    // Play in DeckGUI2 button column
+    tableComponent.getHeader().addColumn("", 5, 100);
     
     // Add the data (model) to the tableComponent
     // This class inherits from .: IS the model, so use "this"
@@ -134,9 +135,30 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
     int columnId,
     bool isRowSelected,
     juce::Component* existingComponentToUpdate)
-{
+{   
     // If the columnId is that for the play button (equals 2)
     if (columnId == 3)
+    {
+        // If pointer to existingComponent is a nullptr (no component has been created yet)
+        if (existingComponentToUpdate == nullptr)
+        {   
+            // Butotn to delete the track
+            // Create the component
+            juce::TextButton* btn = new juce::TextButton{ "Delete" };
+            btn->setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::red);
+            btn->setColour(juce::TextButton::ColourIds::textColourOnId, juce::Colours::snow);
+
+            // Make the button id rowNumber:columnId, so for row 4, column 3, will be string 4:3
+            juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId) };
+            btn->setComponentID(id);
+
+            btn->addListener(this);
+            existingComponentToUpdate = btn;
+        }
+    }
+
+    // If the columnId is that for the play button (equals 2)
+    if (columnId == 4)
     {
         // If pointer to existingComponent is a nullptr (no component has been created yet)
         if (existingComponentToUpdate == nullptr)
@@ -152,8 +174,9 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
             existingComponentToUpdate = btn;
         }
     }
+
     // If the columnId is that for the play button (equals 2)
-    if (columnId == 4)
+    if (columnId == 5)
     {
         // If pointer to existingComponent is a nullptr (no component has been created yet)
         if (existingComponentToUpdate == nullptr)
@@ -208,26 +231,15 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
                 // Add the new track to the list of tracks
                 tracks.push_back(Track{
                 juce::URL{ chosenFile },
-                    chosenFile.getFileName().toStdString(),
+                    chosenFile.getFileNameWithoutExtension().toStdString(),
+                    // Track duration in hrs, mins, seconds
                      trackLengthInHHMMSSFormat,
+                     // Absolute path to the track
                      filePath
                 });
 
-                juce::File targetFile = juce::File(juce::String(fullPathToFile));
-
-                juce::FileOutputStream stream(targetFile);
-
-                if (stream.openedOk())
-                {   
-                    // Overwrite the file by executing the next two commands
-                    stream.setPosition(0);
-                    stream.truncate();
-
-                    for (int i = 0; i < tracks.size(); ++i)
-                    {
-                        stream.writeString(juce::String(tracks[i].getFilePath()));
-                    }
-                }
+                // Stores the updated track data in the CSV File
+                csvHelper.writeTracksDataIntoCSVFile(tracks);
 
                 // Updates and repaints the table component when a new track is added
                 // Attribution: https://forum.juce.com/t/tablelistboxmodel-and-repaint/4915/2
@@ -250,19 +262,38 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
         {
             trackId = id.substr(0, index);
         }
+
         // Get the substring following the ':' (deck id)
         // Attribution: https://stackoverflow.com/questions/28163723/c-how-to-get-substring-after-a-character
-        std::string deckId = id.substr(id.find(':') + 1);
+        int columnId = std::stoi(id.substr(id.find(':') + 1));
         
-        // Conver trackId to an integer, so that it can be used as an index
+        // Convert trackId to an integer, so that it can be used as an index
         int trackIndex = std::stoi(trackId);
+        
+        // Delete the corresponding track
+        if (columnId == 3)
+        {
+            // IMPORTANT-->
+            // Attribution to deleting C++ vector elements: https://www.tutorialspoint.com/cplusplus-program-to-remove-items-from-a-given-vector
+            // Attribution 2:
+            // https://stackoverflow.com/questions/4442477/remove-ith-item-from-a-c-stdvector
+            tracks.erase(tracks.begin() + trackIndex);
+            // Update the CSV file
+            csvHelper.writeTracksDataIntoCSVFile(tracks);
+
+            // Updates and repaints the table component when a new track is added
+            // Attribution: https://forum.juce.com/t/tablelistboxmodel-and-repaint/4915/2
+            tableComponent.updateContent();
+            tableComponent.repaint();
+        }
+
         // Convert column/deckGui id to int and load url into that GUI's DJAudioPlayer
-        if (std::stoi(deckId) == 3)
+        if (columnId == 4)
         {   
             int trackIndex = std::stoi(trackId);
             gui1->loadTrack(tracks[trackIndex].getUrl());
         }
-        else
+        else if (columnId == 5)
         {
             gui2->loadTrack(tracks[trackIndex].getUrl());
         }
@@ -290,32 +321,6 @@ void PlaylistComponent::filesDropped(const juce::StringArray& files, int x, int 
         juce::String fileURLJS = fileURL.toString(false);
         std::string fileURLString = fileURLJS.toStdString();
 
-    }
-}
-
-
-/** Creates a file (if one does not already exist) in the Current Working Directory.
-    * Returns the full path to that file.
-*/
-std::string PlaylistComponent::CreateOrLoadTrackURLsFile()
-{   
-    // Sets the Source folder this code is in to the Current Working Directory
-    (juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" })).setAsCurrentWorkingDirectory();
-
-    // Checks if file already exists, if so, load its path and return it
-    if (!juce::File::getCurrentWorkingDirectory().getChildFile("songUrls.txt").existsAsFile())
-    {   
-        // Set the private member file called "urlsFile" to a new file in the Current Working Directory and create the file
-        juce::File urlsFile = juce::File::getCurrentWorkingDirectory().getChildFile("songUrls.txt");
-        urlsFile.create();
-        return urlsFile.getFullPathName().toStdString();
-    }
-    else
-    {   
-        // If the file already exists because this application has already been opened, store the file in the "urlsFile" private data member
-        DBG("PlaylistComponent::File already exists");
-        juce::File urlsFile = juce::File::getCurrentWorkingDirectory().getChildFile("songUrls.txt");
-        return urlsFile.getFullPathName().toStdString();
     }
 }
 
