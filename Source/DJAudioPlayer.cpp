@@ -4,7 +4,14 @@
 /** Constructor*/
 DJAudioPlayer::DJAudioPlayer(juce::AudioFormatManager& _formatManager) :
     formatManager(_formatManager)
-{
+{   
+    juce::Reverb::Parameters params{};
+    params.roomSize = 0.5f;
+    params.damping = 1.0f;
+    params.wetLevel = 0.4f;
+    params.width = 1.0f;
+    params.freezeMode = 0.8f;
+    reverbAudioSource.setParameters(params);
 }
 /** /Destructor */
 DJAudioPlayer::~DJAudioPlayer()
@@ -18,6 +25,7 @@ void DJAudioPlayer::prepareToPlay(int samplesPerBlockExpected, double sampleRate
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
     resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    reverbAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 // Life
@@ -32,6 +40,7 @@ void DJAudioPlayer::getNextAudioBlock(const juce::AudioSourceChannelInfo& buffer
         return;
     }
     resampleSource.getNextAudioBlock(bufferToFill);
+    reverbAudioSource.getNextAudioBlock(bufferToFill);
 }
 
 // Death
@@ -39,6 +48,7 @@ void DJAudioPlayer::releaseResources()
 {
     transportSource.releaseResources();
     resampleSource.releaseResources();
+    reverbAudioSource.releaseResources();
 }
 //==============================================================================
 
@@ -86,6 +96,7 @@ void DJAudioPlayer::setSpeed(double ratio)
         resampleSource.setResamplingRatio(ratio);
     }
 }
+
 void DJAudioPlayer::setPosition(double posInSecs)
 {
     transportSource.setPosition(posInSecs);

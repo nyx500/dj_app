@@ -11,7 +11,7 @@
 #include "CSVHelper.h"
 
 CSVHelper::CSVHelper()
-{   
+{
     // Gets/creates CSV track data file right away when CSVHelper instance is instantiated in another class
     getAndStoreCSVFile();
 }
@@ -27,7 +27,7 @@ void CSVHelper::getAndStoreCSVFile()
 
     // Checks if the CSV File already exists
     if (!tracksFile.existsAsFile())
-    {   
+    {
         // Create a new trackData.csv file in the current directory
         tracksFile.create();
     }
@@ -42,23 +42,23 @@ void CSVHelper::getAndStoreCSVFile()
     * Pass in the track vector by reference for efficiency
 */
 void CSVHelper::writeTracksDataIntoCSVFile(std::vector<Track>& tracks)
-{   
+{
     // Get the file object from the stored path to file
     juce::File targetFile = juce::File(filePath);
 
     // Create an output stream to write into the file
     juce::FileOutputStream stream(targetFile);
-    
+
     // Write tracks into file only if stream has opened
     if (stream.openedOk())
-    {   
+    {
         // Overwrites the previous data in the file with the help of these juce::FileOutputStream functions
         stream.setPosition(0);
         stream.truncate();
 
         // Iterates over the tracks vector and store data for each track in the file
         for (Track& track : tracks)
-        {   
+        {
             // Uses trackToCSV helper method to output track as a comma-separated string, and writes it to the file
             stream.writeString(trackToCSV(track));
         }
@@ -76,7 +76,7 @@ void CSVHelper::writeTracksDataIntoCSVFile(std::vector<Track>& tracks)
 * vector of tracks (purpose: to store in the PlaylistComponent)
 */
 std::vector<Track> CSVHelper::readTracksDataFromCSVFile()
-{   
+{
     // Create an empty tracks vector
     std::vector<Track> tracks;
 
@@ -90,7 +90,7 @@ std::vector<Track> CSVHelper::readTracksDataFromCSVFile()
         juce::FileInputStream stream(targetFile);
 
         while (!stream.isExhausted())
-        {   
+        {
             // Validate if the track can be parsed from the CSV line, if not catch
             // the exception generate by calling CSVToTrack and output an error message in the DBG console
             try {
@@ -122,7 +122,7 @@ juce::String CSVHelper::trackToCSV(Track& track)
     std::string trackUrlAsString = track.getUrl().toString(false).toStdString();
     // Add the track title, duration, filePath
     std::string trackDataAsString = std::to_string(track.getRowNumber()) + "," + trackUrlAsString + "," + track.getTitle() +
-                                    "," + track.getExtensionName() + "," + track.getDuration() + "," + track.getFilePath();
+        "," + track.getExtensionName() + "," + track.getDuration() + "," + track.getFilePath();
 
     // Converts the line to a juce::String in order to use the juce::WriteString/juce::readString methods to read from a file
     juce::String trackDataAsJuceString = juce::String(trackDataAsString);
@@ -150,21 +150,21 @@ Track CSVHelper::CSVToTrack(juce::StringRef& csvLine)
 
     // Throw an exception if the line cannot be converted into six tokens
     if (trackAsStrings.size() != 6)
-    {   
+    {
         DBG("CSVHelper::CSVToTrack - bad CSV row! Does not have six tokens!");
         throw std::exception();
     }
     else
     {
         // Reminder of order of the tokens from the CSV row: row index, fileUrl (as string), title, file extension, duration, filepath
-        
+
         // Try to convert the row index into a  64-bit-integer, throw error if does not work
         unsigned __int64 rowIndex;
 
         // Throw the error up to the caller if the row-index token cannot be converted to a string
         try
         {
-             rowIndex = std::stoi(trackAsStrings[0].toStdString());
+            rowIndex = std::stoi(trackAsStrings[0].toStdString());
         }
         catch (const std::exception& e)
         {

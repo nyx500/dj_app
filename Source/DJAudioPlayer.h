@@ -48,5 +48,7 @@ private:
     std::unique_ptr <juce::AudioFormatReaderSource> readerSource;
     juce::AudioTransportSource transportSource;
     juce::ResamplingAudioSource resampleSource{ &transportSource, false, 2 };
+    /* An AudioSource that uses the Reverb class to apply a reverb to another AudioSource. */
+    juce::ReverbAudioSource reverbAudioSource{ &transportSource, false};
     bool playing = false;
 };

@@ -52,7 +52,7 @@ public:
         bool rowIsSelected) override;
 
     // Virtual (not pure virtual) method to implement button in a cell
-    juce::Component* refreshComponentForCell(int rowNumber, 
+    juce::Component* refreshComponentForCell(int rowNumber,
         int columnId,
         bool isRowSelected,
         juce::Component* existingComponentToUpdate) override;
@@ -61,7 +61,7 @@ public:
 
     // Inherited method from TextEditor listener
     void textEditorReturnKeyPressed(juce::TextEditor& textEditor) override;
-    
+
     // Inherited method from MouseListener (used to check if user has clicked outside search box)
     void mouseUp(const juce::MouseEvent& event) override;
 
@@ -107,8 +107,8 @@ private:
     */
     void loopOverTracksAndDetermineIfToDisplay(juce::String userInput);
 
-    /* 
-     Method which pushes certain tracks to the tracksToDisplay vector by getting the "isDisplayed" property of every track 
+    /*
+     Method which pushes certain tracks to the tracksToDisplay vector by getting the "isDisplayed" property of every track
      * and pushing only if this value is "true"
     */
     void addTracksToDisplayToDisplayedVector();
@@ -129,7 +129,7 @@ private:
     /* Stores a JUCE text editor component (i.e. a text input field for the "Search" functionality)*/
     juce::TextEditor searchBox;
     /* Button to clear the search criteria */
-    juce::TextButton clearButton { "Clear Search" };
+    juce::TextButton clearButton{ "Clear Search" };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };

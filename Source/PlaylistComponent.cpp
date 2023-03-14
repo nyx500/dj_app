@@ -27,7 +27,7 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     tableComponent.getHeader().addColumn("", 4, 100);
     // Play in DeckGUI2 button column
     tableComponent.getHeader().addColumn("", 5, 100);
-    
+
     // Adds the data (model) to the tableComponent
     // This class inherits from this, so this .: IS the model
     tableComponent.setModel(this);
@@ -56,7 +56,10 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
 
 // Destructor: release memory and reset pointers
 PlaylistComponent::~PlaylistComponent()
-{
+{   
+    // Clear the tracks vectors
+    tracks.clear();
+    tracksToDisplay.clear();
 }
 
 void PlaylistComponent::paint(juce::Graphics& g)
@@ -85,7 +88,7 @@ void PlaylistComponent::resized()
     // components that your component contains..
 
     // Put the add bottom above the playlist table
-    searchBox.setBounds(0, getHeight()* 0.05, getWidth() * 0.6, getHeight() * 0.1);
+    searchBox.setBounds(0, getHeight() * 0.05, getWidth() * 0.6, getHeight() * 0.1);
     clearButton.setBounds(getWidth() * 0.7, getHeight() * 0.05, getWidth() * 0.2, getHeight() * 0.1);
     addButton.setBounds(getWidth() * 0.25, getHeight() * 0.2, getWidth() * 0.5, getHeight() * 0.2);
     tableComponent.setBounds(0, getHeight() * 0.5, getWidth(), getHeight() * 0.5);
@@ -132,7 +135,7 @@ void PlaylistComponent::paintCell(juce::Graphics& g,
         g.drawText(tracksToDisplay[rowNumber].getTitle(),
             2, 0, width - 4, height,
             juce::Justification::centredLeft,
-             true);
+            true);
     }
 
     if (columnId == 2)
@@ -149,14 +152,14 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
     int columnId,
     bool isRowSelected,
     juce::Component* existingComponentToUpdate)
-{   
+{
     // If the columnId is that for the play button (equals 2)
     if (columnId == 3)
     {
         // If pointer to existingComponent is a nullptr (no component has been created yet)
         if (existingComponentToUpdate == nullptr)
-        {   
-            // Butotn to delete the track
+        {
+            // Button to delete the track
             // Create the component
             juce::TextButton* btn = new juce::TextButton{ "Delete" };
             btn->setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::red);
@@ -182,7 +185,7 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
             juce::TextButton* btn = new juce::TextButton{ "Load into Deck 1" };
 
             // Make the button id rowNumber:columnId, so for row 4, column 3, will be string 4:3
-            juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId)};
+            juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId) };
             btn->setComponentID(id);
 
             btn->addListener(this);
@@ -212,7 +215,7 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
 // Normally, we need to check the Address of the Button --> but here we have nothing to compare it to
 // as the buttons are not data members inside this class
 void PlaylistComponent::buttonClicked(juce::Button* button)
-{   
+{
     // If add track button is clicked...
     if (button == &addButton)
     {
@@ -236,6 +239,8 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
                 {
                     double lengthInSeconds = reader->lengthInSamples / reader->sampleRate;
                     trackLengthInHHMMSSFormat = convertTimeInSecondsToString(lengthInSeconds);
+                    delete reader;
+                    reader = nullptr;
                 }
 
                 // Get the absolute path of the file as a string
@@ -245,23 +250,28 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
 
                 // Add the new track to the list of tracks
                 tracks.push_back(Track
-                {   
-                    // Track index
-                    tracks.size(),
-                    // Track URL
-                    juce::URL{ chosenFile },
-                    // Track title
-                    chosenFile.getFileNameWithoutExtension().toStdString(),
-                    // Track extension (e.g. mp3)
-                    chosenFile.getFileExtension().toStdString(),
-                    // Track duration in hrs, mins, seconds
-                    trackLengthInHHMMSSFormat,
-                    // Absolute path to the track
-                    filePath
-                });
+                    {
+                        // Track index
+                        tracks.size(),
+                        // Track URL
+                        juce::URL{ chosenFile },
+                        // Track title
+                        chosenFile.getFileNameWithoutExtension().toStdString(),
+                        // Track extension (e.g. mp3)
+                        chosenFile.getFileExtension().toStdString(),
+                        // Track duration in hrs, mins, seconds
+                        trackLengthInHHMMSSFormat,
+                        // Absolute path to the track
+                        filePath
+                    });
 
                 // Stores the updated track data in the CSV File
                 csvHelper.writeTracksDataIntoCSVFile(tracks);
+
+                // Display all the tracks
+                loopOverTracksAndDetermineIfToDisplay(juce::String(""));
+                addTracksToDisplayToDisplayedVector();
+                searchBox.clear();
 
                 // Updates and repaints the table component when a new track is added
                 // Attribution: https://forum.juce.com/t/tablelistboxmodel-and-repaint/4915/2
@@ -271,7 +281,7 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
             });
     }
     else if (button == &clearButton)
-    {   
+    {
         DBG("clicked on the clear Button");
         // Resets the input to empty string, so that all tracks now have isDisplayed property set to "true", and all tracks are displayed
         loopOverTracksAndDetermineIfToDisplay(juce::String(""));
@@ -298,10 +308,10 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
         // Get the substring following the ':' (deck id)
         // Attribution: https://stackoverflow.com/questions/28163723/c-how-to-get-substring-after-a-character
         int columnId = std::stoi(id.substr(id.find(':') + 1));
-        
+
         // Convert trackId to an integer, so that it can be used as an index
         int trackIndex = std::stoi(trackId);
-        
+
         // Delete the corresponding track
         if (columnId == 3)
         {
@@ -309,9 +319,9 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
             // Attribution to deleting C++ vector elements: https://www.tutorialspoint.com/cplusplus-program-to-remove-items-from-a-given-vector
             // Attribution 2:
             // https://stackoverflow.com/questions/4442477/remove-ith-item-from-a-c-stdvector
-            tracksToDisplay.erase(tracksToDisplay.begin() + trackIndex);
+            tracksToDisplay.erase(tracksToDisplay.end() - (trackIndex + 1));
             // Also erase the track from the hidden track store (tracks which are not currently displayed)
-            tracks.erase(tracks.begin() + trackIndex);
+            tracks.erase(tracks.end() - (trackIndex + 1));
             // Update the CSV file
             csvHelper.writeTracksDataIntoCSVFile(tracks);
 
@@ -323,7 +333,7 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
 
         // Convert column/deckGui id to int and load url into that GUI's DJAudioPlayer
         if (columnId == 4)
-        {   
+        {
             int trackIndex = std::stoi(trackId);
             gui1->loadTrack(tracksToDisplay[trackIndex].getUrl());
         }
@@ -336,7 +346,7 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
 }
 
 void PlaylistComponent::textEditorReturnKeyPressed(juce::TextEditor& textEditor)
-{   
+{
     // Compare addresses of input and the searchBox member variable
     if (&textEditor == &searchBox)
     {
@@ -355,17 +365,17 @@ void PlaylistComponent::textEditorReturnKeyPressed(juce::TextEditor& textEditor)
 
 // Inherited method from MouseListener (used to check if user has clicked outside search box)
 void PlaylistComponent::mouseUp(const juce::MouseEvent& event)
-{   
+{
     // event.eventComponent returns a pointer to the component where mouse was clicked
     // Check if the component clicked on was the searchBox
     if (event.eventComponent == &searchBox)
-    {   
+    {
         DBG("clicked on search box!");
         // Display the caret (textbox cursor)
         searchBox.setCaretVisible(true);
     }
     else
-    {   
+    {
         // Hide the caret if user clicks outside the search box
         DBG("clicked outside the search box!");
         searchBox.setCaretVisible(false);
@@ -476,7 +486,7 @@ void PlaylistComponent::loopOverTracksAndDetermineIfToDisplay(juce::String userI
  *and adding desired tracks to tracksToDisplay
 */
 void PlaylistComponent::addTracksToDisplayToDisplayedVector()
-{   
+{
     // Clears the current vector of tracks to display
     tracksToDisplay.clear();
 
