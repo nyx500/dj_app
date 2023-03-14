@@ -326,10 +326,15 @@ void PlaylistComponent::textEditorReturnKeyPressed(juce::TextEditor& textEditor)
         juce::String inputtedText = textEditor.getText();
         DBG(inputtedText.toStdString());
 
-        // See if track names contain the typed substring
-        for (Track& t : tracks)
+        // Compares search input to track data if there is any (i.e. the input string is not empty)
+        if (inputtedText.isNotEmpty())
         {
+            // Checks if every track contain the typed substring in its title, extension or duration
+            for (Track& t : tracks)
+            {
+                t.determineIfShouldDisplay(inputtedText);
 
+            }
         }
     }
 }
