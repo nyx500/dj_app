@@ -84,6 +84,13 @@ void Track::determineIfShouldDisplay(const juce::String& searchInput)
         DBG("Track::determineIfShouldDisplay - true");
         setIsDisplayed(true);
     }
+    // Search box is empty --> display all the tracks
+    else if (searchInput.isEmpty())
+    {   
+        // If the track data contains the entered substring, set isDisplayed bool to "true"
+        DBG("Track::determineIfShouldDisplay - true");
+        setIsDisplayed(true);
+    }
     else
     {   
 

@@ -94,7 +94,24 @@ private:
     // and therefore store this data in the track object
     juce::AudioFormatManager formatManager;
 
+    // Stores all of the tracks loaded into the library
     std::vector<Track> tracks;
+
+    // Stores only the tracks that should be displayed after user searches for specific terms
+    // The default when program is loaded should be to display all the tracks
+    std::vector<Track> tracksToDisplay;
+
+    /**
+     Method which iterates over all the stored tracks and calls the Track's method called determineIfShouldDisplay(inputtedText),
+     * which sets the isDisplayed property to "true" only if the track data contains the input parameter string as a substring
+    */
+    void loopOverTracksAndDetermineIfToDisplay(juce::String userInput);
+
+    /* 
+     Method which pushes certain tracks to the tracksToDisplay vector by getting the "isDisplayed" property of every track 
+     * and pushing only if this value is "true"
+    */
+    void addTracksToDisplayToDisplayedVector();
 
     // Pass pointers to the 2 DeckGUI elements into the PlaylistComponent, so that the chosen song is played
     // when the user clicks 'play' on it
@@ -111,6 +128,8 @@ private:
 
     /* Stores a JUCE text editor component (i.e. a text input field for the "Search" functionality)*/
     juce::TextEditor searchBox;
+    /* Button to clear the search criteria */
+    juce::TextButton clearButton { "Clear Search" };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };

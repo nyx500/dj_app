@@ -12,7 +12,8 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     // Read tracks stored in file (if any)
     tracks = csvHelper.readTracksDataFromCSVFile();
 
-    //readFile(fullPathToFile);
+    // Sets the tracks that user has searched for (default = all) to be displayed by adding them to the tracksToDisplay vector
+    addTracksToDisplayToDisplayedVector();
 
     // getHeader() returns another kind of component called a Header (look up implementation!)
     // addColumn() function is really gnarly --> but many args are default apart from columnName, columnId, width (first 3 args)
@@ -43,6 +44,9 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     // Restrict invalid input (for security programming purposes): no strings over 100 chars allowed
     // Avoid C++ buffer overflow
     searchBox.setInputRestrictions(100, {});
+    // Add the button to clear the search
+    addAndMakeVisible(clearButton);
+    clearButton.addListener(this);
 
     // I inserted a new formatManager to this class to be able to get
     // the duration of the track in seconds and store it inside the
@@ -81,15 +85,16 @@ void PlaylistComponent::resized()
     // components that your component contains..
 
     // Put the add bottom above the playlist table
-    searchBox.setBounds(getWidth() * 0.25, getHeight()* 0.05, getWidth() * 0.5, getHeight() * 0.1);
+    searchBox.setBounds(0, getHeight()* 0.05, getWidth() * 0.6, getHeight() * 0.1);
+    clearButton.setBounds(getWidth() * 0.7, getHeight() * 0.05, getWidth() * 0.2, getHeight() * 0.1);
     addButton.setBounds(getWidth() * 0.25, getHeight() * 0.2, getWidth() * 0.5, getHeight() * 0.2);
     tableComponent.setBounds(0, getHeight() * 0.5, getWidth(), getHeight() * 0.5);
 }
 
 int PlaylistComponent::getNumRows()
 {
-    // just return the number of tracks in the vector
-    return tracks.size();
+    // just return the number of tracks in the tracksToDisplay array
+    return tracksToDisplay.size();
 }
 
 void PlaylistComponent::paintRowBackground(juce::Graphics& g,
@@ -124,7 +129,7 @@ void PlaylistComponent::paintCell(juce::Graphics& g,
 
     if (columnId == 1)
     {
-        g.drawText(tracks[rowNumber].getTitle(),
+        g.drawText(tracksToDisplay[rowNumber].getTitle(),
             2, 0, width - 4, height,
             juce::Justification::centredLeft,
              true);
@@ -132,7 +137,7 @@ void PlaylistComponent::paintCell(juce::Graphics& g,
 
     if (columnId == 2)
     {
-        g.drawText(tracks[rowNumber].getDuration(),
+        g.drawText(tracksToDisplay[rowNumber].getDuration(),
             2, 0, width - 4, height,
             juce::Justification::centredLeft,
             true);
@@ -265,6 +270,16 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
 
             });
     }
+    else if (button == &clearButton)
+    {   
+        DBG("clicked on the clear Button");
+        // Resets the input to empty string, so that all tracks now have isDisplayed property set to "true", and all tracks are displayed
+        loopOverTracksAndDetermineIfToDisplay(juce::String(""));
+        addTracksToDisplayToDisplayedVector();
+        searchBox.clear();
+        tableComponent.updateContent();
+        tableComponent.repaint();
+    }
     else
     {
         // Converts JUCE String to std::string and then to integer
@@ -294,6 +309,8 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
             // Attribution to deleting C++ vector elements: https://www.tutorialspoint.com/cplusplus-program-to-remove-items-from-a-given-vector
             // Attribution 2:
             // https://stackoverflow.com/questions/4442477/remove-ith-item-from-a-c-stdvector
+            tracksToDisplay.erase(tracksToDisplay.begin() + trackIndex);
+            // Also erase the track from the hidden track store (tracks which are not currently displayed)
             tracks.erase(tracks.begin() + trackIndex);
             // Update the CSV file
             csvHelper.writeTracksDataIntoCSVFile(tracks);
@@ -308,11 +325,11 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
         if (columnId == 4)
         {   
             int trackIndex = std::stoi(trackId);
-            gui1->loadTrack(tracks[trackIndex].getUrl());
+            gui1->loadTrack(tracksToDisplay[trackIndex].getUrl());
         }
         else if (columnId == 5)
         {
-            gui2->loadTrack(tracks[trackIndex].getUrl());
+            gui2->loadTrack(tracksToDisplay[trackIndex].getUrl());
         }
     }
 
@@ -326,16 +343,13 @@ void PlaylistComponent::textEditorReturnKeyPressed(juce::TextEditor& textEditor)
         juce::String inputtedText = textEditor.getText();
         DBG(inputtedText.toStdString());
 
-        // Compares search input to track data if there is any (i.e. the input string is not empty)
-        if (inputtedText.isNotEmpty())
-        {
-            // Checks if every track contain the typed substring in its title, extension or duration
-            for (Track& t : tracks)
-            {
-                t.determineIfShouldDisplay(inputtedText);
+        // Determine which tracks should have isDisplayed set to true based on user input
+        loopOverTracksAndDetermineIfToDisplay(inputtedText);
+        // Adds the tracks which now have isDisplayed set to true to the tracksToDisplay vector
+        addTracksToDisplayToDisplayedVector();
 
-            }
-        }
+        tableComponent.updateContent();
+        tableComponent.repaint();
     }
 }
 
@@ -441,4 +455,36 @@ void PlaylistComponent::readFile(std::string path) {
         }
     }
 
+}
+
+
+/**
+  Method which iterates over all the stored tracks and calls the Track's method called determineIfShouldDisplay(inputtedText),
+  * which sets the isDisplayed property to "true" only if the track data contains the input parameter string as a substring
+ */
+void PlaylistComponent::loopOverTracksAndDetermineIfToDisplay(juce::String userInput)
+{
+    // Checks if each track contains the typed substring in its title or extension
+    for (Track& t : tracks)
+    {
+        t.determineIfShouldDisplay(userInput);
+    }
+}
+
+/*
+ Method which sets which tracks to display by getting the "isDisplayed" property of every track
+ *and adding desired tracks to tracksToDisplay
+*/
+void PlaylistComponent::addTracksToDisplayToDisplayedVector()
+{   
+    // Clears the current vector of tracks to display
+    tracksToDisplay.clear();
+
+    for (Track& t : tracks)
+    {
+        if (t.getIsDisplayed())
+        {
+            tracksToDisplay.push_back(t);
+        }
+    }
 }
