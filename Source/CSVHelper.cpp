@@ -94,6 +94,8 @@ std::vector<Track> CSVHelper::readTracksDataFromCSVFile()
             // Validate if the track can be parsed from the CSV line, if not catch
             // the exception generate by calling CSVToTrack and output an error message in the DBG console
             try {
+                // This called-function throws an error if the tokens cannot be parsed from the CSV
+                // E.g. if the rowIndex token cannot be converted from a string to an integer
                 Track track = CSVToTrack(juce::StringRef(stream.readString()));
 
                 // Add the track to the tracks vector to return
@@ -117,9 +119,10 @@ juce::String CSVHelper::trackToCSV(Track& track)
 {
     // Constructs a comma-separated string out of the different track properties
     // Converts the track's juce::URL property into a std::string data type
-    std::string trackDataAsString = track.getUrl().toString(false).toStdString();
+    std::string trackUrlAsString = track.getUrl().toString(false).toStdString();
     // Add the track title, duration, filePath
-    trackDataAsString = trackDataAsString + "," + track.getTitle() + "," + track.getDuration() + "," + track.getFilePath();
+    std::string trackDataAsString = std::to_string(track.getRowNumber()) + "," + trackUrlAsString + "," + track.getTitle() +
+                                    "," + track.getExtensionName() + "," + track.getDuration() + "," + track.getFilePath();
 
     // Converts the line to a juce::String in order to use the juce::WriteString/juce::readString methods to read from a file
     juce::String trackDataAsJuceString = juce::String(trackDataAsString);
@@ -145,21 +148,37 @@ Track CSVHelper::CSVToTrack(juce::StringRef& csvLine)
     // Adds the tokens the track is made of to the trackAsStrings array
     trackAsStrings.addTokens(csvLine, juce::StringRef(","), juce::StringRef(","));
 
-    // Throw an exception if the line cannot be converted into four tokens
-    if (trackAsStrings.size() != 4)
+    // Throw an exception if the line cannot be converted into six tokens
+    if (trackAsStrings.size() != 6)
     {   
-        DBG("CSVHelper::CSVToTrack - bad CSV row!");
+        DBG("CSVHelper::CSVToTrack - bad CSV row! Does not have six tokens!");
         throw std::exception();
     }
     else
     {
-        // Reminder of order of the tokens from the CSV row: fileUrl (as string), title, duration, filepath
-        // Turn the JUCE::Strings into std::strings!
+        // Reminder of order of the tokens from the CSV row: row index, fileUrl (as string), title, file extension, duration, filepath
+        
+        // Try to convert the row index into a  64-bit-integer, throw error if does not work
+        unsigned __int64 rowIndex;
+
+        // Throw the error up to the caller if the row-index token cannot be converted to a string
+        try
+        {
+             rowIndex = std::stoi(trackAsStrings[0].toStdString());
+        }
+        catch (const std::exception& e)
+        {
+            throw;
+        }
+
+        // Create a track if error is not thrown when converting the row index token from string to an integer
         Track track{
-            juce::URL(juce::String(trackAsStrings[0])),
-            juce::String(trackAsStrings[1]).toStdString(),
+            rowIndex,
+            juce::URL(juce::String(trackAsStrings[1])),
             juce::String(trackAsStrings[2]).toStdString(),
-            juce::String(trackAsStrings[3]).toStdString()
+            juce::String(trackAsStrings[3]).toStdString(),
+            juce::String(trackAsStrings[4]).toStdString(),
+            juce::String(trackAsStrings[5]).toStdString()
         };
 
         return track;

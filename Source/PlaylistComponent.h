@@ -15,7 +15,11 @@ class PlaylistComponent : public juce::Component,
     public juce::TableListBoxModel,
     public juce::Button::Listener,
     // Enables adding of files through drag-and-drop
-    public juce::FileDragAndDropTarget
+    public juce::FileDragAndDropTarget,
+    // A listener for the text input box
+    public juce::TextEditor::Listener,
+    // A mouse listener to hide search box's caret when user has clicked outside of it
+    public juce::MouseListener
 {
 public:
     PlaylistComponent(
@@ -55,6 +59,12 @@ public:
 
     void buttonClicked(juce::Button* button) override;
 
+    // Inherited method from TextEditor listener
+    void textEditorReturnKeyPressed(juce::TextEditor& textEditor) override;
+    
+    // Inherited method from MouseListener (used to check if user has clicked outside search box)
+    void mouseUp(const juce::MouseEvent& event) override;
+
     // Drag and drop functions
     bool isInterestedInFileDrag(const juce::StringArray& iles) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
@@ -70,13 +80,13 @@ private:
     std::string convertTimeInSecondsToString(double timeInSeconds);
 
     // Button to add a track to the playlist table
-    juce::TextButton addButton{ "ADD NEW TRACK" };
+    juce::TextButton addButton{ "ADD TRACK" };
 
     juce::TableListBox tableComponent;
 
     // Make a file chooser in order to add files to the playlist
     // https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
-    juce::FileChooser fChooser{ "Select a file..." };
+    juce::FileChooser fChooser{ "Select an audio file..." };
 
     // Create a format manager for the PlaylistComponent (outside the main deckGUI component
     // as there is only one playlistComponent for an app and 2 DeckGUIs!) as it cannot access
@@ -98,6 +108,9 @@ private:
     * CSV tracksData file that stores the data for the loaded tracks
     */
     CSVHelper csvHelper;
+
+    /* Stores a JUCE text editor component (i.e. a text input field for the "Search" functionality)*/
+    juce::TextEditor searchBox;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };

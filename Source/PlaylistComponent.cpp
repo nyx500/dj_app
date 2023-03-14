@@ -27,13 +27,22 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     // Play in DeckGUI2 button column
     tableComponent.getHeader().addColumn("", 5, 100);
     
-    // Add the data (model) to the tableComponent
-    // This class inherits from .: IS the model, so use "this"
+    // Adds the data (model) to the tableComponent
+    // This class inherits from this, so this .: IS the model
     tableComponent.setModel(this);
 
     addAndMakeVisible(tableComponent);
     addAndMakeVisible(addButton);
     addButton.addListener(this);
+
+    // Adds functionality/listeners for search text input box
+    addAndMakeVisible(searchBox);
+    searchBox.addListener(this);
+    // Registers a listener to be told when mouse events occur in this component.
+    searchBox.addMouseListener(this, true);
+    // Restrict invalid input (for security programming purposes): no strings over 100 chars allowed
+    // Avoid C++ buffer overflow
+    searchBox.setInputRestrictions(100, {});
 
     // I inserted a new formatManager to this class to be able to get
     // the duration of the track in seconds and store it inside the
@@ -72,9 +81,9 @@ void PlaylistComponent::resized()
     // components that your component contains..
 
     // Put the add bottom above the playlist table
-    addButton.setBounds(getWidth() * 0.25, 0, getWidth() * 0.5, getHeight() * 0.2);
-    tableComponent.setBounds(0, getHeight() * 0.2, getWidth(), getHeight());
-
+    searchBox.setBounds(getWidth() * 0.25, getHeight()* 0.05, getWidth() * 0.5, getHeight() * 0.1);
+    addButton.setBounds(getWidth() * 0.25, getHeight() * 0.2, getWidth() * 0.5, getHeight() * 0.2);
+    tableComponent.setBounds(0, getHeight() * 0.5, getWidth(), getHeight() * 0.5);
 }
 
 int PlaylistComponent::getNumRows()
@@ -152,6 +161,7 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
             juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId) };
             btn->setComponentID(id);
 
+            // Add listener to the delete buttons
             btn->addListener(this);
             existingComponentToUpdate = btn;
         }
@@ -229,13 +239,20 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
 
 
                 // Add the new track to the list of tracks
-                tracks.push_back(Track{
-                juce::URL{ chosenFile },
+                tracks.push_back(Track
+                {   
+                    // Track index
+                    tracks.size(),
+                    // Track URL
+                    juce::URL{ chosenFile },
+                    // Track title
                     chosenFile.getFileNameWithoutExtension().toStdString(),
+                    // Track extension (e.g. mp3)
+                    chosenFile.getFileExtension().toStdString(),
                     // Track duration in hrs, mins, seconds
-                     trackLengthInHHMMSSFormat,
-                     // Absolute path to the track
-                     filePath
+                    trackLengthInHHMMSSFormat,
+                    // Absolute path to the track
+                    filePath
                 });
 
                 // Stores the updated track data in the CSV File
@@ -301,6 +318,40 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
 
 }
 
+void PlaylistComponent::textEditorReturnKeyPressed(juce::TextEditor& textEditor)
+{   
+    // Compare addresses of input and the searchBox member variable
+    if (&textEditor == &searchBox)
+    {
+        juce::String inputtedText = textEditor.getText();
+        DBG(inputtedText.toStdString());
+
+        // See if track names contain the typed substring
+        for (Track& t : tracks)
+        {
+
+        }
+    }
+}
+
+// Inherited method from MouseListener (used to check if user has clicked outside search box)
+void PlaylistComponent::mouseUp(const juce::MouseEvent& event)
+{   
+    // event.eventComponent returns a pointer to the component where mouse was clicked
+    // Check if the component clicked on was the searchBox
+    if (event.eventComponent == &searchBox)
+    {   
+        DBG("clicked on search box!");
+        // Display the caret (textbox cursor)
+        searchBox.setCaretVisible(true);
+    }
+    else
+    {   
+        // Hide the caret if user clicks outside the search box
+        DBG("clicked outside the search box!");
+        searchBox.setCaretVisible(false);
+    }
+}
 
 // Drag and drop functions
 bool PlaylistComponent::isInterestedInFileDrag(const juce::StringArray& files)
