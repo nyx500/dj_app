@@ -17,7 +17,10 @@ ReverbEffects::ReverbEffects(DJAudioPlayer* _player)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
-
+    addAndMakeVisible(roomSizeSlider);
+    roomSizeSlider.addListener(this);
+    roomSizeSlider.setRange(0.0, 1.0);
+    roomSizeSlider.setValue(0.5);
 }
 
 ReverbEffects::~ReverbEffects()
@@ -35,7 +38,7 @@ void ReverbEffects::paint (juce::Graphics& g)
 
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
-    g.setColour (juce::Colours::grey);
+    g.setColour (juce::Colours::mediumpurple);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
 
     g.setColour (juce::Colours::white);
@@ -48,9 +51,8 @@ void ReverbEffects::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
-
+    roomSizeSlider.setBounds(0, 0, getWidth(), getHeight());
 }
-
 
 
 /** Implements the button listener by overriding the inherited buttonClicked method*/
@@ -62,5 +64,8 @@ void ReverbEffects::buttonClicked(juce::Button* button)
 /**Implement the slider listener by overriding the inherited sliderValueChanged method*/
 void ReverbEffects::sliderValueChanged(juce::Slider* slider)
 {
-
+    if (slider == &roomSizeSlider)
+    {
+        player->setReverbRoomSize(slider->getValue());
+    }
 }

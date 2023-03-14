@@ -6,11 +6,14 @@ DJAudioPlayer::DJAudioPlayer(juce::AudioFormatManager& _formatManager) :
     formatManager(_formatManager)
 {   
     juce::Reverb::Parameters params{};
+
+    // List of default reverb parameters
     params.roomSize = 0.5f;
-    params.damping = 1.0f;
-    params.wetLevel = 0.4f;
+    params.damping = 0.5f;
+    params.wetLevel = 0.33f;
+    params.dryLevel = 0.4f;
     params.width = 1.0f;
-    params.freezeMode = 0.8f;
+    params.freezeMode = 0.0f;
     reverbAudioSource.setParameters(params);
 }
 /** /Destructor */
@@ -24,22 +27,22 @@ DJAudioPlayer::~DJAudioPlayer()
 void DJAudioPlayer::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);  
     reverbAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 // Life
 void DJAudioPlayer::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
 {
-    // Delegates responsibility to transport source
-    //transportSource.getNextAudioBlock(bufferToFill);
 
     if (readerSource.get() == nullptr || !playing)
     {
         bufferToFill.clearActiveBufferRegion();
         return;
     }
-    resampleSource.getNextAudioBlock(bufferToFill);
+
+    //resampleSource.getNextAudioBlock(bufferToFill);
+    // Delegate responsibility to the reverbAudioSource which takes in the resampleSource as a parameter when created
     reverbAudioSource.getNextAudioBlock(bufferToFill);
 }
 
@@ -114,6 +117,19 @@ void DJAudioPlayer::setPositionRelative(double pos)
         double posInSecs = transportSource.getLengthInSeconds() * pos;
         setPosition(posInSecs);
     }
+}
+
+
+// Set the roomSize property of the reverb effect
+void DJAudioPlayer::setReverbRoomSize(double roomSize)
+{   
+    DBG("calling DJAudioPlayer::setReverbRoomSize");
+    DBG(std::to_string(roomSize));
+    juce::Reverb::Parameters params = reverbAudioSource.getParameters();
+
+    params.roomSize = roomSize;
+
+    reverbAudioSource.setParameters(params);
 }
 
 // Basic sound stopping and starting functions

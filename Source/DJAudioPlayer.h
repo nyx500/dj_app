@@ -27,6 +27,8 @@ public:
     void setPosition(double posInSecs);
     // Relative means between '0 and 1' instead of between 0 and "number of seconds"
     void setPositionRelative(double pos);
+    // Set the roomSize property of the reverb effect
+    void setReverbRoomSize(double roomSize);
 
     // Basic stopping and starting functions
     /** Start playing the file */
@@ -49,6 +51,6 @@ private:
     juce::AudioTransportSource transportSource;
     juce::ResamplingAudioSource resampleSource{ &transportSource, false, 2 };
     /* An AudioSource that uses the Reverb class to apply a reverb to another AudioSource. */
-    juce::ReverbAudioSource reverbAudioSource{ &transportSource, false};
+    juce::ReverbAudioSource reverbAudioSource{ &resampleSource, false};
     bool playing = false;
 };

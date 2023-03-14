@@ -35,6 +35,7 @@ public:
 
 private:
 
+    juce::Slider roomSizeSlider;
     // Can send messages from listeners to DJAudioPlayer now
     // Pass the player into the constructor
     DJAudioPlayer* player;

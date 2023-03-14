@@ -22,6 +22,8 @@ waveformDisplay(formatManagerToUse, cacheToUse)
     addAndMakeVisible(waveformDisplay);
     // Add the Fader component
     addAndMakeVisible(fader);
+    // Add the ReverbEffects component
+    addAndMakeVisible(reverbEffects);
 
     // Add the Deck GUI as a listener to its own buttons
     playButton.addListener(this);
@@ -69,7 +71,7 @@ void DeckGUI::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
-    double rowH = getHeight() / 8;
+    double rowH = getHeight() / 9;
     // Put play and stop buttons next to each other
     playButton.setBounds(0, 0, getWidth() / 2, rowH);
     stopButton.setBounds(getWidth() / 2, 0, getWidth() / 2, rowH);
@@ -78,8 +80,8 @@ void DeckGUI::resized()
     volSlider.setBounds(0, rowH * 4, getWidth(), rowH);
     speedSlider.setBounds(0, rowH * 5, getWidth(), rowH);
     posSlider.setBounds(0, rowH * 6, getWidth(), rowH);
-    // WaveformDisplay should take up two rows (make height double the row height)
-    waveformDisplay.setBounds(0, rowH * 7, getWidth(), rowH); // Takes up two rows in the display
+    waveformDisplay.setBounds(0, rowH * 7, getWidth(), rowH);
+    reverbEffects.setBounds(0, rowH * 8, getWidth(), rowH);
 }
 
 
