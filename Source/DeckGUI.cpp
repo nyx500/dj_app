@@ -6,7 +6,7 @@ DeckGUI::DeckGUI(
     DJAudioPlayer* _player,
     juce::AudioFormatManager& formatManagerToUse,
     juce::AudioThumbnailCache& cacheToUse
-) : player(_player), // Set the player pointer up
+) : player(_player), // Sets the player pointer up
 waveformDisplay(formatManagerToUse, cacheToUse)
 {
     // In your constructor, you should add any child components, and
@@ -104,11 +104,7 @@ void DeckGUI::sliderValueChanged(juce::Slider* slider)
 
     if (slider == &volSlider)
     {   
-        // Only use the Volume Slider to adjust the volume if "Fade" is turned OFF
-        if (!fader.getFadeIn() && !fader.getFadeOut())
-        {
-            player->setGain(slider->getValue());
-        }
+        player->setGain(slider->getValue());
     }
 
     if (slider == &speedSlider)
@@ -116,7 +112,6 @@ void DeckGUI::sliderValueChanged(juce::Slider* slider)
         DBG(slider->getValue());
         player->setSpeed(slider->getValue());
     }
-
 
     if (slider == &posSlider)
     {

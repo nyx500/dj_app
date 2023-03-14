@@ -4,13 +4,14 @@
 #include "DJAudioPlayer.h"
 #include "WaveformDisplay.h"
 #include "Fader.h"
+#include "ReverbEffects.h"
 
 //==============================================================================
 /*
 */
 class DeckGUI : public juce::Component,
     public juce::Button::Listener,
-    public juce::Slider::Listener, // inherit listeners
+    public juce::Slider::Listener,
     public juce::FileDragAndDropTarget,
     public juce::Timer
 {
@@ -62,7 +63,11 @@ private:
     // Pass the player into the constructor
     DJAudioPlayer* player;
 
+    // Buttons to fade in/fade out the track
     Fader fader{};
+
+    // Stores buttons for reverb effects on the track
+    ReverbEffects reverbEffects{player};
 
     // Creates an instance of the WaveformDisplay class component
     WaveformDisplay waveformDisplay;
