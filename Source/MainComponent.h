@@ -54,5 +54,8 @@ private:
 
     PlaylistComponent playlistComponent{&deckGUI1, &deckGUI2};
 
+    // Custom font
+    juce::Font techFont;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };

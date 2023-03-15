@@ -4,6 +4,10 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="TI4ETB" name="DJApp">
     <GROUP id="{77C77215-3C5D-8EBB-FAF8-101947DA9D16}" name="Source">
+      <FILE id="qQ3QWt" name="RobotInvaders.ttf" compile="0" resource="1"
+            file="../robot-invaders-font/RobotInvaders.ttf"/>
+      <FILE id="qvsIt1" name="RobotInvadersItalic.ttf" compile="0" resource="1"
+            file="../robot-invaders-font/RobotInvadersItalic.ttf"/>
       <FILE id="UXas6Q" name="pause.png" compile="0" resource="1" file="Source/pause.png"/>
       <FILE id="bUPasn" name="play.png" compile="0" resource="1" file="Source/play.png"/>
       <FILE id="cRnbBm" name="ReverbEffects.cpp" compile="1" resource="0"

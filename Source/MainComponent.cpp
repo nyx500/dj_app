@@ -1,3 +1,5 @@
+/**Attribution for font typeface: https://www.fontspace.com/robot-invaders-font-f70280 */
+
 #include "MainComponent.h"
 #include "DJAudioPlayer.h"
 #include "DeckGUI.h"
@@ -30,6 +32,11 @@ MainComponent::MainComponent()
     addAndMakeVisible(playlistComponent);
 
     formatManager.registerBasicFormats();
+
+    // Set up the custom font
+    // Attribution: https://forum.juce.com/t/modern-custom-font-guide/20841/3
+    auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::RobotInvaders_ttf, BinaryData::RobotInvaders_ttfSize);
+    techFont = juce::Font(typeface);
 }
 
 MainComponent::~MainComponent()
@@ -88,6 +95,7 @@ void MainComponent::paint(juce::Graphics& g)
     juce::Rectangle background(0, 0, getWidth(), getHeight());
     g.fillRect(background);
 
+    g.setFont(techFont);
     g.setFont(40.0);
     g.setColour(juce::Colours::white);
     g.drawText("OtoDecks", getWidth() * 0.25, 0, getWidth() * 0.5, getHeight() * 0.1, juce::Justification::centredTop, true);
