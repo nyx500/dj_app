@@ -12,7 +12,8 @@
 #include "Fader.h"
 
 //==============================================================================
-Fader::Fader()
+Fader::Fader(DJAudioPlayer* _player) :
+    player(_player)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -20,24 +21,21 @@ Fader::Fader()
     addAndMakeVisible(fadeInButton);
     addAndMakeVisible(fadeOutButton);
     addAndMakeVisible(stopFadeButton);
-    addAndMakeVisible(minVolumeSlider);
-    addAndMakeVisible(maxVolumeSlider);
+    addAndMakeVisible(fadeSpeedSlider);
 
-    minVolumeSlider.setRange(0.0, 0.95, 0.001);
-    maxVolumeSlider.setRange(0.05, 1.0, 0.001);
+    // Sets slider range for how fast to fade in or out
+    fadeSpeedSlider.setRange(0.0, 0.2, 0.001);
+    // Sets the default valuen for the slider to 0.002
+    fadeSpeedSlider.setValue(0.002);
 
-
-    fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::dodgerblue);
-    fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkslateblue);
+    fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
+    fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
     stopFadeButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::red);
-    minVolumeSlider.setSliderStyle(juce::Slider::LinearBar);
-    maxVolumeSlider.setSliderStyle(juce::Slider::LinearBar);
 
     fadeInButton.addListener(this);
     fadeOutButton.addListener(this);
     stopFadeButton.addListener(this);
-    minVolumeSlider.addListener(this);
-    maxVolumeSlider.addListener(this);
+    fadeSpeedSlider.addListener(this);
 }
 
 Fader::~Fader()
@@ -69,13 +67,12 @@ void Fader::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
-    double rowHeight = getHeight() / 4;
+    double rowHeight = getHeight() / 3;
 
     fadeInButton.setBounds(0, 0, getWidth() / 2, rowHeight);
     fadeOutButton.setBounds(getWidth() / 2, 0, getWidth() / 2, rowHeight);
     stopFadeButton.setBounds(0, rowHeight, getWidth(), rowHeight);
-    maxVolumeSlider.setBounds(0, rowHeight * 2, getWidth(), rowHeight);
-    minVolumeSlider.setBounds(0, rowHeight * 3, getWidth(), rowHeight);
+    fadeSpeedSlider.setBounds(0, rowHeight * 2, getWidth(), rowHeight);
 }
 
 /** Implements the button listener */
@@ -83,80 +80,36 @@ void Fader::buttonClicked(juce::Button* button)
 {
     if (button == &fadeInButton)
     {   
-        // Stop fadeOut to do start fadeIn
-        if (fadeOut)
-        {
-            fadeOut = false;
-            // Change fadeOut button to "off" colour
-            fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkslateblue);
-        }
-
-        // Change colour of the button to "on" button colour
+        player->autoFadeIn();
+        // Changes colour of the button to "on" button colour
         fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::deeppink);
-        fadeIn = true;
+        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
 
     }
 
     if (button == &fadeOutButton)
     {
-        if (fadeIn)
-        {
-            fadeIn = false;
-            // Change fadeIn button to "off" colour
-            fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::dodgerblue);
-        }
-
+        player->autoFadeOut();
         // Change colour of the button to "on" button colour
-        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::hotpink);
-        fadeOut = true;
+        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::deeppink);
+        fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
 
     }
 
     if (button == &stopFadeButton)
-    {
-        fadeIn = false; 
-        fadeOut = false;
-
+    {   
+        player->stopAutoFade();
         // Change colours back to "off" colours
-        fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::dodgerblue);
-        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkslateblue);
+        fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
+        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
     }
 }
 
 /**Implements Slider::Listener */
 void Fader::sliderValueChanged(juce::Slider* slider)
 {
-    if (slider == &minVolumeSlider)
+    if (slider == &fadeSpeedSlider)
     {
-        fadeOutMinVol = slider->getValue();
+        player->setFadeSpeed(slider->getValue());
     }
-
-    if (slider == &maxVolumeSlider)
-    {
-        fadeInMaxVol = slider->getValue();
-    }
-}
-
-/** Getter for fadeIn value: returns fadeIn bool value */
-bool Fader::getFadeIn()
-{
-    return fadeIn;
-}
-
-/** Getter for fadeOut value: returns fadeOut bool value */
-bool Fader::getFadeOut()
-{
-    return fadeOut;
-}
-
-/** Getter for fadeInSpeed: returns fadeIn speed */
-double Fader::getFadeInMaxVol()
-{
-    return fadeInMaxVol;
-}
-
-/** Getter for fadeOutSpeed: returns fadeOut speed */
-double Fader::getFadeOutMinVol()
-{
-    return fadeOutMinVol;
 }

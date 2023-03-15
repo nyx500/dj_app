@@ -38,7 +38,7 @@ public:
     bool isInterestedInFileDrag(const juce::StringArray& iles) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
 
-    // Implement juce::Timer pure virtual function
+    // Implement juce::Timer's inherited pure virtual function
     void timerCallback() override;
 
     /** A file URL is passed in from the Playlist Component and loaded into the DJAudioplayer */
@@ -64,7 +64,7 @@ private:
     DJAudioPlayer* player;
 
     // Buttons to fade in/fade out the track
-    Fader fader{};
+    Fader fader{player};
 
     // Stores buttons for reverb effects on the track
     ReverbEffects reverbEffects{player};

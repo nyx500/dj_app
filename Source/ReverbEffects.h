@@ -34,8 +34,17 @@ public:
     void resized() override;
 
 private:
-
+    // Sliders to control various "reverb parameters" that go in the Reverb::Parameters "struct"
     juce::Slider roomSizeSlider;
+    juce::Slider dampingSlider;
+    juce::Slider wetLevelSlider;
+    juce::Slider dryLevelSlider;
+    juce::Slider reverbWidthSlider;
+    juce::Slider freezeModeSlider;
+
+    // Button to reset the parameters to defaults
+    juce::TextButton resetParamsButton{"Reset to Default"};
+
     // Can send messages from listeners to DJAudioPlayer now
     // Pass the player into the constructor
     DJAudioPlayer* player;

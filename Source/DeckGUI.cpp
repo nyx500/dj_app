@@ -71,17 +71,17 @@ void DeckGUI::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
-    double rowH = getHeight() / 9;
+    double rowH = getHeight() / 7;
     // Put play and stop buttons next to each other
-    playButton.setBounds(0, 0, getWidth() / 2, rowH);
-    stopButton.setBounds(getWidth() / 2, 0, getWidth() / 2, rowH);
+    playButton.setBounds(0, 0, getWidth() / 2, rowH / 2);
+    stopButton.setBounds(getWidth() / 2, 0, getWidth() / 2, rowH / 2);
     //// Add the fader display (itisa pointer to the fader, so use '->' syntax here)
-    fader.setBounds(0, rowH, getWidth(), rowH * 3);
-    volSlider.setBounds(0, rowH * 4, getWidth(), rowH);
-    speedSlider.setBounds(0, rowH * 5, getWidth(), rowH);
-    posSlider.setBounds(0, rowH * 6, getWidth(), rowH);
-    waveformDisplay.setBounds(0, rowH * 7, getWidth(), rowH);
-    reverbEffects.setBounds(0, rowH * 8, getWidth(), rowH);
+    fader.setBounds(0, rowH / 2, getWidth(), rowH * 2);
+    volSlider.setBounds(0, rowH * 2.5, getWidth(), rowH / 2);
+    speedSlider.setBounds(0, rowH * 3, getWidth(), rowH / 2);
+    posSlider.setBounds(0, rowH * 3.5, getWidth(), rowH / 2);
+    waveformDisplay.setBounds(0, rowH * 4, getWidth(), rowH / 2);
+    reverbEffects.setBounds(0, rowH * 4.5, getWidth(), rowH * 2.5);
 }
 
 
@@ -146,58 +146,6 @@ void DeckGUI::filesDropped(const juce::StringArray& files, int x, int y)
 void DeckGUI::timerCallback()
 {
     waveformDisplay.setPositionRelative(player->getPositionRelative());
-
-    // Implementing the functionality for the "fade" effect...
-    // Get the fadeIn boolean from Fader component
-    if (fader.getFadeIn())
-    {   
-        DBG("getFadeIn is being called!");
-
-        // Get the current maxLimit for how loud the song should fade into
-        // from the Fader class
-        double maxLimit = fader.getFadeInMaxVol();
-
-        DBG("Max limit:");
-        DBG(maxLimit);
-
-        // Get the current volume of the song being played from audioTransportSource
-        double currentVolume = player->getGain();
-
-        DBG("Current volume:");
-        DBG(currentVolume);
-
-        // If the volume is not yet at the fader-determined limit, increase it
-        // Stop setting the gain if the maxLimit is reached
-        if (currentVolume < maxLimit)
-        {   
-            player->setGain(currentVolume + 0.001);
-        }
-    }   
-
-    if (fader.getFadeOut())
-    {   
-        DBG("getFadeOut is being called!");
-
-        // Get the current minLimit for how loud the song should fade out, get
-        // from the Fader class
-        double minLimit = fader.getFadeOutMinVol();
-        DBG(minLimit);
-
-        // Get the current volume of the song being played from audioTransportSource
-        double currentVolume = player->getGain();
-
-        DBG("Current volume:");
-        DBG(currentVolume);
-
-        // If the volume is not yet at the fader-determined limit, decrease it
-       // Stop setting the gain if the minLimit is reached
-        if (currentVolume > minLimit)
-        {
-            player->setGain(currentVolume - 0.001);
-            DBG("Current volume after adapting:");
-            DBG(player->getGain());
-        }
-    }
 }
 
 
