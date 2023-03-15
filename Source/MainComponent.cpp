@@ -69,7 +69,28 @@ void MainComponent::releaseResources()
 void MainComponent::paint(juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+    //g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+
+    juce::Rectangle bounds = getLocalBounds();
+    juce::Point ptTopLeft = bounds.getTopLeft();
+    int ptTopLeftX = ptTopLeft.getX();
+    float ptTopLeftXFloat = (float)ptTopLeftX;
+    int ptTopLeftY = ptTopLeft.getY();
+    float ptTopLeftYFloat = (float)ptTopLeftY;
+    juce::Point ptBottomRight = bounds.getBottomRight();
+    int ptBottomRightX = ptBottomRight.getX();
+    float ptBottomRightXFloat = (float)ptBottomRightX;
+    int ptBottomRightY = ptBottomRight.getY();
+    float ptBottomRightYFloat = (float)ptBottomRightY;
+
+    juce::ColourGradient gradient(juce::Colours::black, ptTopLeftXFloat, ptTopLeftYFloat, juce::Colours::navy, ptBottomRightXFloat, ptBottomRightYFloat, true);
+    g.setGradientFill(gradient);
+    juce::Rectangle background(0, 0, getWidth(), getHeight());
+    g.fillRect(background);
+
+    g.setFont(40.0);
+    g.setColour(juce::Colours::white);
+    g.drawText("OtoDecks", getWidth() * 0.25, 0, getWidth() * 0.5, getHeight() * 0.1, juce::Justification::centredTop, true);
 
 }
 
@@ -77,10 +98,10 @@ void MainComponent::paint(juce::Graphics& g)
 void MainComponent::resized()
 {   
 
-    playlistComponent.setBounds(0, getHeight() * 0.08, getWidth() * 0.2, getHeight() * 0.9);
+    playlistComponent.setBounds(0, getHeight() * 0.08, getWidth() * 0.3, getHeight() * 0.9);
 
-    deckGUI1.setBounds(getWidth() * 0.22, getHeight() * 0.08, getWidth() * 0.76, getHeight() * 0.42);
-    deckGUI2.setBounds(getWidth() * 0.22, getHeight() * 0.52, getWidth() * 0.76, getHeight() * 0.42);
+    deckGUI1.setBounds(getWidth() * 0.32, getHeight() * 0.08, getWidth() * 0.66, getHeight() * 0.42);
+    deckGUI2.setBounds(getWidth() * 0.32, getHeight() * 0.52, getWidth() * 0.66, getHeight() * 0.42);
 
 
 
