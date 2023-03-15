@@ -8,9 +8,19 @@ DeckGUI::DeckGUI(
     juce::AudioThumbnailCache& cacheToUse
 ) : player(_player), // Sets the player pointer up
 waveformDisplay(formatManagerToUse, cacheToUse)
-{
+{   
+    // Resize the play/pause icons stored as juce::Image data members
+    playImage = playImage.rescaled(80, 80, juce::Graphics::mediumResamplingQuality);
+    pauseImage = pauseImage.rescaled(80, 80, juce::Graphics::mediumResamplingQuality);
+
+
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
+
+    // Add icons
+    playButton.setImages(true, true, true, playImage, 1.0, juce::Colour(), juce::Image(), 0.7, juce::Colour(255, 255, 255), juce::Image(), 1.0, juce::Colour(255, 255, 255), 0.0f);
+    stopButton.setImages(true, true, true, pauseImage, 1.0, juce::Colour(), juce::Image(), 0.7, juce::Colour(255, 255, 255), juce::Image(), 1.0, juce::Colour(255, 255, 255), 0.0f);
+
     addAndMakeVisible(playButton);
     addAndMakeVisible(stopButton);
 
@@ -18,7 +28,7 @@ waveformDisplay(formatManagerToUse, cacheToUse)
     addAndMakeVisible(speedSlider);
     addAndMakeVisible(posSlider);
 
-    // Add the Waveform component
+    //// Add the Waveform component
     addAndMakeVisible(waveformDisplay);
     // Add the Fader component
     addAndMakeVisible(fader);
@@ -73,15 +83,15 @@ void DeckGUI::resized()
     // components that your component contains..
     double rowH = getHeight() / 7;
     // Put play and stop buttons next to each other
-    playButton.setBounds(0, 0, getWidth() / 2, rowH / 2);
-    stopButton.setBounds(getWidth() / 2, 0, getWidth() / 2, rowH / 2);
+    playButton.setBounds(getWidth() * 0.05, rowH * 0.25, getWidth() * 0.1, rowH);
+    stopButton.setBounds(getWidth() * 0.18, rowH * 0.25, getWidth() * 0.1, rowH);
+    waveformDisplay.setBounds(getWidth() * 0.3, 0, getWidth() * 0.7, rowH * 1.5);
     //// Add the fader display (itisa pointer to the fader, so use '->' syntax here)
-    fader.setBounds(0, rowH / 2, getWidth(), rowH * 2);
-    volSlider.setBounds(0, rowH * 2.5, getWidth(), rowH / 2);
-    speedSlider.setBounds(0, rowH * 3, getWidth(), rowH / 2);
-    posSlider.setBounds(0, rowH * 3.5, getWidth(), rowH / 2);
-    waveformDisplay.setBounds(0, rowH * 4, getWidth(), rowH / 2);
-    reverbEffects.setBounds(0, rowH * 4.5, getWidth(), rowH * 2.5);
+    fader.setBounds(0, rowH * 1.5, getWidth(), rowH * 2);
+    /*volSlider.setBounds(0, rowH * 3, getWidth(), rowH / 2);
+    speedSlider.setBounds(0, rowH * 3.5, getWidth(), rowH / 2);
+    posSlider.setBounds(0, rowH * 4, getWidth(), rowH / 2);
+    reverbEffects.setBounds(0, rowH * 5, getWidth(), rowH * 2);*/
 }
 
 
@@ -111,13 +121,11 @@ void DeckGUI::sliderValueChanged(juce::Slider* slider)
 
     if (slider == &speedSlider)
     {
-        DBG(slider->getValue());
         player->setSpeed(slider->getValue());
     }
 
     if (slider == &posSlider)
     {
-        DBG(slider->getValue());
         player->setPositionRelative(slider->getValue());
     }
 }
@@ -127,13 +135,12 @@ void DeckGUI::sliderValueChanged(juce::Slider* slider)
 // Drag and drop functions
 bool DeckGUI::isInterestedInFileDrag(const juce::StringArray& files)
 {
-    DBG("DeckGUI::isInterestedInFileDrag");
     return true;
 }
 
 void DeckGUI::filesDropped(const juce::StringArray& files, int x, int y)
 {
-    DBG("DeckGUI::filesDropped");
+    //DBG("DeckGUI::filesDropped");
 
     // Only want one file
     if (files.size() == 1)

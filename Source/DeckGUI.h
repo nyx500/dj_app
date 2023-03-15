@@ -47,8 +47,18 @@ public:
 
 private:
     // Your private member variables go here...
-    juce::TextButton playButton{ "PLAY" };
-    juce::TextButton stopButton{ "STOP" };
+    // 
+    // Play and pause icons stored here
+
+    // Load play/pause images from Source directory
+    juce::File playImageFile = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" }).getChildFile("play.png");
+    juce::File pauseImageFile = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" }).getChildFile("pause.png");
+    // Converts the files to a juce Image format
+    juce::Image playImage = juce::PNGImageFormat::loadFrom(playImageFile);
+    juce::Image pauseImage = juce::PNGImageFormat::loadFrom(pauseImageFile);
+
+    juce::ImageButton playButton{ "PLAY"};
+    juce::ImageButton stopButton{ "STOP" };
 
     juce::Slider volSlider;
     juce::Slider speedSlider;

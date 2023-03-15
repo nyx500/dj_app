@@ -4,6 +4,8 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="TI4ETB" name="DJApp">
     <GROUP id="{77C77215-3C5D-8EBB-FAF8-101947DA9D16}" name="Source">
+      <FILE id="UXas6Q" name="pause.png" compile="0" resource="1" file="Source/pause.png"/>
+      <FILE id="bUPasn" name="play.png" compile="0" resource="1" file="Source/play.png"/>
       <FILE id="cRnbBm" name="ReverbEffects.cpp" compile="1" resource="0"
             file="Source/ReverbEffects.cpp"/>
       <FILE id="a4Vn3d" name="ReverbEffects.h" compile="0" resource="0" file="Source/ReverbEffects.h"/>
@@ -23,14 +25,14 @@
       <FILE id="LS5nDn" name="WaveformDisplay.h" compile="0" resource="0"
             file="Source/WaveformDisplay.h"/>
       <FILE id="za9alY" name="Fader.cpp" compile="1" resource="0" file="Source/Fader.cpp"/>
+      <FILE id="SBsKtN" name="CSVHelper.h" compile="0" resource="0" file="Source/CSVHelper.h"/>
       <FILE id="kHVzd2" name="Fader.h" compile="0" resource="0" file="Source/Fader.h"/>
+      <FILE id="NFy51V" name="CSVHelper.cpp" compile="1" resource="0" file="Source/CSVHelper.cpp"/>
       <FILE id="SBrOdN" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="tAwcCb" name="DJAudioPlayer.h" compile="0" resource="0" file="Source/DJAudioPlayer.h"/>
       <FILE id="DoKZiQ" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
     </GROUP>
-    <FILE id="NFy51V" name="CSVHelper.cpp" compile="1" resource="0" file="Source/CSVHelper.cpp"/>
-    <FILE id="SBsKtN" name="CSVHelper.h" compile="0" resource="0" file="Source/CSVHelper.h"/>
   </MAINGROUP>
   <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1"/>
   <EXPORTFORMATS>
