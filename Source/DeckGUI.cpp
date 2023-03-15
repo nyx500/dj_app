@@ -25,8 +25,30 @@ waveformDisplay(formatManagerToUse, cacheToUse)
     addAndMakeVisible(stopButton);
 
     addAndMakeVisible(volSlider);
+    volSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour());
+    volSlider.setColour(juce::Slider::trackColourId, juce::Colours::white);
+    volSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, getParentWidth() * 0.5, getParentHeight() * 2);
     addAndMakeVisible(speedSlider);
+    speedSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour());
+    speedSlider.setColour(juce::Slider::trackColourId, juce::Colours::white);
+    speedSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, getParentWidth() * 0.5, getParentHeight() * 2);
     addAndMakeVisible(posSlider);
+    posSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour());
+    posSlider.setColour(juce::Slider::trackColourId, juce::Colours::white);
+    posSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, getParentWidth() * 0.5, getParentHeight() * 2);
+
+    addAndMakeVisible(volLabel);
+    addAndMakeVisible(speedLabel);
+    addAndMakeVisible(posLabel);
+
+    volLabel.setText("Volume", juce::dontSendNotification);
+    speedLabel.setText("Speed", juce::dontSendNotification);
+    posLabel.setText("Position", juce::dontSendNotification);
+
+    volLabel.setJustificationType(juce::Justification::centred);
+    speedLabel.setJustificationType(juce::Justification::centred);
+    posLabel.setJustificationType(juce::Justification::centred);
+
 
     //// Add the Waveform component
     addAndMakeVisible(waveformDisplay);
@@ -42,9 +64,14 @@ waveformDisplay(formatManagerToUse, cacheToUse)
     speedSlider.addListener(this);
     posSlider.addListener(this);
 
+    // Set slider ranges
     volSlider.setRange(0.0, 1.0);
     speedSlider.setRange(0.0, 10.0);
     posSlider.setRange(0.0, 1.0);
+
+    // Set slider default positions
+    volSlider.setValue(0.5);
+    speedSlider.setValue(1.0);
 
     // Argument: how often to call the timerCallback function
     startTimer(10); //'100' means 100 milliseconds (tenth of a a second)
@@ -66,15 +93,20 @@ void DeckGUI::paint(juce::Graphics& g)
        drawing code..
     */
 
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));   // clear the background
+    // Set background to transparent/null colour
+    g.fillAll(juce::Colour());
 
-    g.setColour(juce::Colours::grey);
-    g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-
+    // Draw a black rounded rectangle of same size as this component
+    g.setColour(juce::Colours::black);
+    g.fillRoundedRectangle(0, 0, getWidth(), getHeight(), 10.0);
+    // Draw a white outline around the above rectangle
+    g.setColour(juce::Colours::white);
+    g.drawRoundedRectangle(0, 0, getWidth(), getHeight(), 10.0, 4.0);
+/*
     g.setColour(juce::Colours::white);
     g.setFont(14.0f);
     g.drawText("DeckGUI", getLocalBounds(),
-        juce::Justification::centred, true);   // draw some placeholder text
+        juce::Justification::centred, true); */  // draw some placeholder text
 }
 
 void DeckGUI::resized()
@@ -85,13 +117,15 @@ void DeckGUI::resized()
     // Put play and stop buttons next to each other
     playButton.setBounds(getWidth() * 0.05, rowH * 0.25, getWidth() * 0.1, rowH);
     stopButton.setBounds(getWidth() * 0.18, rowH * 0.25, getWidth() * 0.1, rowH);
-    waveformDisplay.setBounds(getWidth() * 0.3, 0, getWidth() * 0.7, rowH * 1.5);
-    //// Add the fader display (itisa pointer to the fader, so use '->' syntax here)
-    fader.setBounds(0, rowH * 1.5, getWidth(), rowH * 2);
-    /*volSlider.setBounds(0, rowH * 3, getWidth(), rowH / 2);
-    speedSlider.setBounds(0, rowH * 3.5, getWidth(), rowH / 2);
-    posSlider.setBounds(0, rowH * 4, getWidth(), rowH / 2);
-    reverbEffects.setBounds(0, rowH * 5, getWidth(), rowH * 2);*/
+    waveformDisplay.setBounds(getWidth() * 0.3, rowH * 0.25, getWidth() * 0.68, rowH);
+    fader.setBounds(getWidth() * 0.02, rowH * 1.5, getWidth() * 0.3, rowH * 5);
+    volSlider.setBounds(getWidth() * 0.34, rowH * 1.5, getWidth() * 0.2, rowH * 0.8);
+    volLabel.setBounds(getWidth() * 0.34, rowH * 2.3, getWidth() * 0.2, rowH/2);
+    speedSlider.setBounds(getWidth() * 0.34, rowH * 3.5, getWidth() * 0.2, rowH * 0.8);
+    speedLabel.setBounds(getWidth() * 0.34, rowH * 4.3, getWidth() * 0.2, rowH/2);
+    posSlider.setBounds(getWidth() * 0.34, rowH * 5.4, getWidth() * 0.2, rowH);
+    posLabel.setBounds(getWidth() * 0.34, rowH * 6.3, getWidth() * 0.2, rowH / 2);
+    reverbEffects.setBounds(getWidth() * 0.54, rowH * 1.5, getWidth() * 0.47, getHeight() - rowH * 1.6);
 }
 
 

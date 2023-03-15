@@ -40,6 +40,7 @@ private:
     juce::TextButton fadeOutButton{ "Fade Out" };
     juce::TextButton stopFadeButton{ "Stop Fade" };
     juce::Slider fadeSpeedSlider;
+    juce::Label labelForFadeSpeedSlider;
 
     // Pass the player into the constructor
     DJAudioPlayer* player;

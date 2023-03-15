@@ -64,6 +64,9 @@ private:
     juce::Slider speedSlider;
     juce::Slider posSlider;
 
+    juce::Label volLabel;
+    juce::Label speedLabel;
+    juce::Label posLabel;
 
     // https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
     juce::FileChooser fChooser{ "Select a file..." };

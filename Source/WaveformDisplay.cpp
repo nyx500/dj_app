@@ -38,14 +38,15 @@ void WaveformDisplay::paint(juce::Graphics& g)
        drawing code..
     */
 
-    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));   // clear the background
+    // Set black background
+    g.fillAll(juce::Colours::black);
 
-    g.setColour(juce::Colours::grey);
-    g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
+    // Outline component in blue
+    g.setColour(juce::Colours::blue);
+    g.drawRect(getLocalBounds(), 1.0);  // draw an outline around the component
 
-    g.setColour(juce::Colours::black);
-
-    // Draw waveform/audio thumb only if the file has loaded successfully
+    g.setColour(juce::Colours::white);
+    // Draw the waveform/audio thumb only if the file has loaded successfully
     if (fileLoaded)
     {
         // AudioThumbnail has a complicated function called ::drawChannel
@@ -58,13 +59,13 @@ void WaveformDisplay::paint(juce::Graphics& g)
             0, // Start time of audio files
             audioThumb.getTotalLength(), // End of audio file (total length) in seconds
             0, // Channel number (left-channel --> don't need to draw both channels)
-            0.9 // "Vertical-zoom factor" --> boosts up the sound if it's really quiet. If 1 = fills up the whole container.
+            0.8 // "Vertical-zoom factor" --> boosts up the sound if it's really quiet. If 1 = fills up the whole container.
 
         );
 
-        juce::Rectangle playedSectionRect = juce::Rectangle(0, 0, (int)(position * getWidth()), getHeight());
+        juce::Rectangle playedSectionRect = juce::Rectangle((int)(getWidth() * 0.1), (int)(getHeight() * 0.1), (int)(position * getWidth()), getHeight());
 
-        g.setColour(juce::Colours::darkviolet.withAlpha(0.35f));
+        g.setColour(juce::Colours::black.withAlpha(0.5f));
         g.fillRect(0, 0, position * getWidth(), getHeight());
 
 
@@ -83,22 +84,19 @@ void WaveformDisplay::paint(juce::Graphics& g)
         //    0.5 // "Vertical-zoom factor" --> boosts up the sound if it's really quiet. If 1 = fills up the whole container.
         //);
         //
-        // Draws the playhead on the waveform
-        g.setColour(juce::Colours::yellow);
+        // Draws the playhead on the waveform in blue
+        g.setColour(juce::Colours::blue);
 
         g.fillRect(getWidth() * position, 0, 3, getHeight());
 
-        g.setColour(juce::Colours::yellow);
         g.setFont(20.0f);
 
         double timeInSeconds = position * trackLength;
         g.drawText(displayTimeAsString(timeInSeconds), 0, 0, 100, 100, 9, true);
-
-        ;
     }
     else // File is not loaded
     {
-        g.setColour(juce::Colours::yellow);
+        g.setColour(juce::Colours::blue);
         g.setFont(20.0f); // make the font bigger (original = 14.0f)
         g.drawText("File not loaded...", getLocalBounds(),
             juce::Justification::centred, true);   // draw some placeholder text

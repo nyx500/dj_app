@@ -22,39 +22,75 @@ ReverbEffects::ReverbEffects(DJAudioPlayer* _player)
 
     // Reverb "Room Size" slider
     addAndMakeVisible(roomSizeSlider);
+    addAndMakeVisible(roomSizeLabel);
     roomSizeSlider.addListener(this);
     roomSizeSlider.setRange(0.0, 1.0);
     roomSizeSlider.setValue(0.5);
+    roomSizeSlider.setSliderStyle(juce::Slider::LinearVertical);
+    roomSizeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, getParentWidth(), 30);
+    roomSizeLabel.setText("Room", juce::dontSendNotification);
+    roomSizeLabel.setJustificationType(juce::Justification::centredTop);
+    roomSizeLabel.setColour(juce::Label::textColourId, juce::Colours::white);
 
     // Reverb Damping slider
     addAndMakeVisible(dampingSlider);
+    addAndMakeVisible(dampingLabel);
     dampingSlider.addListener(this);
     dampingSlider.setRange(0.0, 1.0);
     dampingSlider.setValue(0.5);
+    dampingSlider.setSliderStyle(juce::Slider::LinearVertical);
+    dampingSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, getParentWidth(), 30);
+    dampingLabel.setText("Damp", juce::dontSendNotification);
+    dampingLabel.setJustificationType(juce::Justification::centredTop);
+    dampingLabel.setColour(juce::Label::textColourId, juce::Colours::white);
 
     // Reverb "Wet Level" slider
     addAndMakeVisible(wetLevelSlider);
+    addAndMakeVisible(wetLevelLabel);
     wetLevelSlider.addListener(this);
     wetLevelSlider.setRange(0.0, 1.0);
     wetLevelSlider.setValue(0.33);
+    wetLevelSlider.setSliderStyle(juce::Slider::LinearVertical);
+    wetLevelSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, getParentWidth(), 30);
+    wetLevelLabel.setText("Wet", juce::dontSendNotification);
+    wetLevelLabel.setJustificationType(juce::Justification::centredTop);
+    wetLevelLabel.setColour(juce::Label::textColourId, juce::Colours::white);
 
     // Reverb "Dry Level" slider
     addAndMakeVisible(dryLevelSlider);
+    addAndMakeVisible(dryLevelLabel);
     dryLevelSlider.addListener(this);
     dryLevelSlider.setRange(0.0, 1.0);
     dryLevelSlider.setValue(0.4);
+    dryLevelSlider.setSliderStyle(juce::Slider::LinearVertical);
+    dryLevelSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, getParentWidth(), 30);
+    dryLevelLabel.setText("Dry", juce::dontSendNotification);
+    dryLevelLabel.setJustificationType(juce::Justification::centredTop);
+    dryLevelLabel.setColour(juce::Label::textColourId, juce::Colours::white);
 
     // Reverb "Width" slider
     addAndMakeVisible(reverbWidthSlider);
+    addAndMakeVisible(reverbWidthLabel);
     reverbWidthSlider.addListener(this);
     reverbWidthSlider.setRange(0.0, 1.0);   
     reverbWidthSlider.setValue(1.0);
+    reverbWidthSlider.setSliderStyle(juce::Slider::LinearVertical);
+    reverbWidthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, getParentWidth(), 30);
+    reverbWidthLabel.setText("Width", juce::dontSendNotification);
+    reverbWidthLabel.setJustificationType(juce::Justification::centredTop);
+    reverbWidthLabel.setColour(juce::Label::textColourId, juce::Colours::white);
 
     // Reverb "Freeze Mode" slider
     addAndMakeVisible(freezeModeSlider);
+    addAndMakeVisible(freezeModeLabel);
     freezeModeSlider.addListener(this);
     freezeModeSlider.setRange(0.0, 1.0);
     freezeModeSlider.setValue(0.0);
+    freezeModeSlider.setSliderStyle(juce::Slider::LinearVertical);
+    freezeModeSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, getParentWidth(), 30);
+    freezeModeLabel.setText("Freeze", juce::dontSendNotification);
+    freezeModeLabel.setJustificationType(juce::Justification::centredTop);
+    freezeModeLabel.setColour(juce::Label::textColourId, juce::Colours::white);
 
     // The Reset Parameters to Default button
     addAndMakeVisible(resetParamsButton);
@@ -74,29 +110,28 @@ void ReverbEffects::paint (juce::Graphics& g)
        drawing code..
     */
 
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
+    g.fillAll (juce::Colour());   // clear the background
 
-    g.setColour (juce::Colours::mediumpurple);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (juce::Colours::white);
-    g.setFont (14.0f);
-    g.drawText ("ReverbEffects", getLocalBounds(),
-                juce::Justification::centred, true);   // draw some placeholder text
 }
 
 void ReverbEffects::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
-    double rowH = getHeight() / 7;
-    roomSizeSlider.setBounds(0, 0, getWidth(), rowH);
-    dampingSlider.setBounds(0, rowH, getWidth(), rowH);
-    wetLevelSlider.setBounds(0, rowH * 2, getWidth(), rowH);
-    dryLevelSlider.setBounds(0, rowH * 3, getWidth(), rowH);
-    reverbWidthSlider.setBounds(0, rowH * 4, getWidth(), rowH);
-    freezeModeSlider.setBounds(0, rowH * 5, getWidth(), rowH);
-    resetParamsButton.setBounds(0, rowH * 6, getWidth(), rowH);
+    double colW = getWidth() / 7;
+    roomSizeLabel.setBounds(0, 0, colW, getHeight() * 0.1);
+    roomSizeSlider.setBounds(0, getHeight() * 0.1, colW, getHeight() * 0.7);
+    dampingLabel.setBounds(colW, 0, colW, getHeight() * 0.1);
+    dampingSlider.setBounds(colW, getHeight() * 0.1, colW, getHeight() * 0.7);
+    wetLevelLabel.setBounds(colW * 2, 0, colW, getHeight() * 0.1);
+    wetLevelSlider.setBounds(colW * 2, getHeight() * 0.1, colW, getHeight() * 0.7);
+    dryLevelLabel.setBounds(colW * 3, 0, colW, getHeight() * 0.1);
+    dryLevelSlider.setBounds(colW * 3, getHeight() * 0.1, colW, getHeight() * 0.7);
+    reverbWidthLabel.setBounds(colW * 4, 0, colW, getHeight() * 0.1);
+    reverbWidthSlider.setBounds(colW * 4, getHeight() * 0.1, colW, getHeight() * 0.7);
+    freezeModeLabel.setBounds(colW * 5, 0, colW, getHeight() * 0.1);
+    freezeModeSlider.setBounds(colW * 5, getHeight() * 0.1, colW, getHeight() * 0.7);
+    resetParamsButton.setBounds(0, getHeight() * 0.9, getWidth() * 0.9, getHeight() * 0.1);
 }
 
 

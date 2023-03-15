@@ -42,6 +42,15 @@ private:
     juce::Slider reverbWidthSlider;
     juce::Slider freezeModeSlider;
 
+    // Slider labels
+    juce::Label roomSizeLabel;
+    juce::Label dampingLabel;
+    juce::Label wetLevelLabel;
+    juce::Label dryLevelLabel;
+    juce::Label reverbWidthLabel;
+    juce::Label freezeModeLabel;
+
+
     // Button to reset the parameters to defaults
     juce::TextButton resetParamsButton{"Reset to Default"};
 
