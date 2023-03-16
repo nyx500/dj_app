@@ -205,26 +205,6 @@ void DeckGUI::sliderValueChanged(juce::Slider* slider)
     }
 }
 
-
-/** FileDragAndDropTarget virtual function: callback to check whether this target is interested in the set of files being offered*/
-bool DeckGUI::isInterestedInFileDrag(const juce::StringArray& files)
-{
-    return true;
-}
-
-
-/** FileDragAndDropTarget virtual function: callback to indicate that the user has dropped the files onto this component*/
-void DeckGUI::filesDropped(const juce::StringArray& files, int x, int y)
-{
-    // Only want to get one file at a time!
-    if (files.size() == 1)
-    {
-        // Converts the filename string into a file then into a URL
-        player->loadURL(juce::URL{ juce::File{files[0]} });
-    }
-}
-
-
 /** Implements juce::Timer's inherited pure virtual function: callback routine that actually gets called periodically */
 void DeckGUI::timerCallback()
 {   

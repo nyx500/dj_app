@@ -29,7 +29,7 @@ Fader::Fader(DJAudioPlayer* _player) : player(_player)
 
     // Sets the default value for the fadespeed slider to 0.002
     fadeSpeedSlider.setValue(0.002);
-    // Make the slider round
+    // Make the slider round    
     fadeSpeedSlider.setSliderStyle(juce::Slider::Rotary);
 
     // Initially set fader buttons to darkgrey --> bright blue when 'on', dark grey when 'off'

@@ -10,7 +10,6 @@
 class DeckGUI : public juce::Component,
     public juce::Button::Listener,
     public juce::Slider::Listener,
-    public juce::FileDragAndDropTarget,
     public juce::Timer
 {
 public:
@@ -43,12 +42,6 @@ public:
 
     /** Implements the pure virtual function that cames with the Slider listener which this class inherits from */
     void sliderValueChanged(juce::Slider* slider) override;
-
-    /** FileDragAndDropTarget virtual function: callback to check whether this target is interested in the set of files being offered*/
-    bool isInterestedInFileDrag(const juce::StringArray& iles) override;
-
-    /** FileDragAndDropTarget virtual function: callback to indicate that the user has dropped the files onto this component*/
-    void filesDropped(const juce::StringArray& files, int x, int y) override;
 
     /** Implements juce::Timer's inherited pure virtual function: callback routine that actually gets called periodically */
     void timerCallback() override;
