@@ -46,9 +46,9 @@ private:
     // Pass in the formatManager (a reference!!!) into the DJAudioPlayers
     DJAudioPlayer player1{ formatManager };
     // Pass in the data components into the DeckGUI instances
-    DeckGUI deckGUI1{ &player1, formatManager, thumbCache };
+    DeckGUI deckGUI1{ &player1, formatManager, thumbCache, "D1"};
     DJAudioPlayer player2{ formatManager };
-    DeckGUI deckGUI2{ &player2, formatManager, thumbCache };
+    DeckGUI deckGUI2{ &player2, formatManager, thumbCache, "D2"};
 
     juce::MixerAudioSource mixerSource;
 

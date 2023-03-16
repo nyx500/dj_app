@@ -20,7 +20,8 @@ public:
     DeckGUI(
         DJAudioPlayer* _player,
         juce::AudioFormatManager& formatManagerToUse, // Pass in these args from mainComponent to use the data in the AudioThumbnail
-        juce::AudioThumbnailCache& cacheToUse
+        juce::AudioThumbnailCache& cacheToUse,
+        std::string _deckTitle
     );
     ~DeckGUI() override;
 
@@ -84,6 +85,9 @@ private:
 
     // Creates an instance of the WaveformDisplay class component
     WaveformDisplay waveformDisplay;
+
+    // Deck number/name
+    std::string deckTitle;
 
     // A macro which handles memory leaks
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DeckGUI)

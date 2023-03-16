@@ -79,9 +79,6 @@ private:
     */
     std::string convertTimeInSecondsToString(double timeInSeconds);
 
-    // Button to add a track to the playlist table
-    juce::TextButton addButton{ "ADD TRACK" };
-
     juce::TableListBox tableComponent;
 
     // Make a file chooser in order to add files to the playlist
@@ -128,8 +125,29 @@ private:
 
     /* Stores a JUCE text editor component (i.e. a text input field for the "Search" functionality)*/
     juce::TextEditor searchBox;
+    /* Label for the search box*/
+    juce::Label searchBoxLabel;
     /* Button to clear the search criteria */
     juce::TextButton clearButton{ "Clear Search" };
+
+    // Loads Add icon from Source directory
+    juce::File addButtonImageFile = juce::File::getCurrentWorkingDirectory().getChildFile("add.png");
+    // Converts the file with the "add" icon to a juce Image format
+    juce::Image addIcon = juce::PNGImageFormat::loadFrom(addButtonImageFile);
+    // Button to add a track to the playlist table
+    juce::ImageButton addButton{ "ADD TRACK" };
+    // Loads Delete Track icon from Source directory
+    juce::File deleteButtonImageFile = juce::File::getCurrentWorkingDirectory().getChildFile("delete.png");
+    // Converts the file with the "delete" icon to a juce Image format
+    juce::Image deleteIcon = juce::PNGImageFormat::loadFrom(deleteButtonImageFile);
+    // Loads Add to Deck 1 icon from Source directory
+    juce::File d1ButtonImageFile = juce::File::getCurrentWorkingDirectory().getChildFile("D1.png");
+    // Converts the file with the "D1" icon to a juce Image format
+    juce::Image d1Icon = juce::PNGImageFormat::loadFrom(d1ButtonImageFile);
+    // Loads Add to Deck 2 icon from Source directory
+    juce::File d2ButtonImageFile = juce::File::getCurrentWorkingDirectory().getChildFile("D2.png");
+    // Converts the file with the "D2" icon to a juce Image format
+    juce::Image d2Icon = juce::PNGImageFormat::loadFrom(d2ButtonImageFile);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };

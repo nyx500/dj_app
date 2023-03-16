@@ -4,15 +4,21 @@
               addUsingNamespaceToJuceHeader="0" displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="TI4ETB" name="DJApp">
     <GROUP id="{77C77215-3C5D-8EBB-FAF8-101947DA9D16}" name="Source">
+      <FILE id="eJF9Du" name="add.png" compile="0" resource="1" file="Source/add.png"/>
       <FILE id="qQ3QWt" name="RobotInvaders.ttf" compile="0" resource="1"
             file="../robot-invaders-font/RobotInvaders.ttf"/>
       <FILE id="qvsIt1" name="RobotInvadersItalic.ttf" compile="0" resource="1"
             file="../robot-invaders-font/RobotInvadersItalic.ttf"/>
       <FILE id="UXas6Q" name="pause.png" compile="0" resource="1" file="Source/pause.png"/>
       <FILE id="bUPasn" name="play.png" compile="0" resource="1" file="Source/play.png"/>
+      <FILE id="CkbvAc" name="D2.png" compile="0" resource="1" file="../../../../../Downloads/D2.png"/>
       <FILE id="cRnbBm" name="ReverbEffects.cpp" compile="1" resource="0"
             file="Source/ReverbEffects.cpp"/>
+      <FILE id="fUYfCI" name="Untitled design (1).png" compile="0" resource="1"
+            file="../../../../../Downloads/Untitled design (1).png"/>
+      <FILE id="Eu1bmw" name="D1.png" compile="0" resource="1" file="../../../../../Downloads/D1.png"/>
       <FILE id="a4Vn3d" name="ReverbEffects.h" compile="0" resource="0" file="Source/ReverbEffects.h"/>
+      <FILE id="Uual0S" name="delete.png" compile="0" resource="1" file="Source/delete.png"/>
       <FILE id="xpj5EI" name="Track.cpp" compile="1" resource="0" file="Source/Track.cpp"/>
       <FILE id="ZDNWUr" name="Track.h" compile="0" resource="0" file="Source/Track.h"/>
       <FILE id="W39kd3" name="PlaylistComponent.cpp" compile="1" resource="0"

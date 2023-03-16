@@ -5,9 +5,11 @@
 DeckGUI::DeckGUI(
     DJAudioPlayer* _player,
     juce::AudioFormatManager& formatManagerToUse,
-    juce::AudioThumbnailCache& cacheToUse
+    juce::AudioThumbnailCache& cacheToUse,
+    std::string _deckTitle
 ) : player(_player), // Sets the player pointer up
-waveformDisplay(formatManagerToUse, cacheToUse)
+waveformDisplay(formatManagerToUse, cacheToUse),
+deckTitle(_deckTitle)
 {   
     // Resize the play/pause icons stored as juce::Image data members
     playImage = playImage.rescaled(80, 80, juce::Graphics::mediumResamplingQuality);
@@ -102,11 +104,10 @@ void DeckGUI::paint(juce::Graphics& g)
     // Draw a white outline around the above rectangle
     g.setColour(juce::Colours::white);
     g.drawRoundedRectangle(0, 0, getWidth(), getHeight(), 10.0, 4.0);
-/*
+
     g.setColour(juce::Colours::white);
-    g.setFont(14.0f);
-    g.drawText("DeckGUI", getLocalBounds(),
-        juce::Justification::centred, true); */  // draw some placeholder text
+    g.setFont(20.0);
+    g.drawText(juce::String(deckTitle), getWidth() * 0.05, getHeight() * 0.81, getWidth(), getHeight() * 0.2, juce::Justification::left, true);
 }
 
 void DeckGUI::resized()

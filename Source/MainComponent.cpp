@@ -105,12 +105,9 @@ void MainComponent::paint(juce::Graphics& g)
 // Runs when app first opens or user resizes the app
 void MainComponent::resized()
 {   
+    playlistComponent.setBounds(getWidth() * 0.01, getHeight() * 0.08, getWidth() * 0.4, getHeight() * 0.9);
 
-    playlistComponent.setBounds(0, getHeight() * 0.08, getWidth() * 0.3, getHeight() * 0.9);
-
-    deckGUI1.setBounds(getWidth() * 0.32, getHeight() * 0.08, getWidth() * 0.66, getHeight() * 0.42);
-    deckGUI2.setBounds(getWidth() * 0.32, getHeight() * 0.52, getWidth() * 0.66, getHeight() * 0.42);
-
-
+    deckGUI1.setBounds(getWidth() * 0.42, getHeight() * 0.08, getWidth() * 0.57, getHeight() * 0.42);
+    deckGUI2.setBounds(getWidth() * 0.42, getHeight() * 0.52, getWidth() * 0.57, getHeight() * 0.42);
 
 }
