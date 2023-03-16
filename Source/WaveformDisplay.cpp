@@ -6,7 +6,7 @@
 WaveformDisplay::WaveformDisplay(
     juce::AudioFormatManager& formatManagerToUse,
     juce::AudioThumbnailCache& cacheToUse,
-    juce::Font _techFont
+    juce::Font& _techFont
 ) :
     // First argument (sourceSamplesPerThumbnailSample): use 1000 points to plot the waveform  
     // (an audio file has millions of points) -->

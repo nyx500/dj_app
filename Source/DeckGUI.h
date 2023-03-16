@@ -22,7 +22,7 @@ public:
         juce::AudioFormatManager& formatManagerToUse, // Pass in these args from mainComponent to use the data in the AudioThumbnail
         juce::AudioThumbnailCache& cacheToUse,
         std::string _deckTitle,
-        juce::Font _techFont
+        juce::Font& _techFont
     );
     ~DeckGUI() override;
 

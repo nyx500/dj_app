@@ -7,7 +7,7 @@ DeckGUI::DeckGUI(
     juce::AudioFormatManager& formatManagerToUse,
     juce::AudioThumbnailCache& cacheToUse,
     std::string _deckTitle,
-    juce::Font _techFont
+    juce::Font& _techFont
 ) : player(_player), // Sets the player pointer up
 waveformDisplay(formatManagerToUse, cacheToUse, _techFont),
 deckTitle(_deckTitle),

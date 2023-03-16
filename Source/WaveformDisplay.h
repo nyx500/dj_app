@@ -12,7 +12,7 @@ public:
     WaveformDisplay(
         juce::AudioFormatManager& formatManagerToUse,
         juce::AudioThumbnailCache& cacheToUse,
-        juce::Font _techFont
+        juce::Font& _techFont
     );
     ~WaveformDisplay() override;
 
