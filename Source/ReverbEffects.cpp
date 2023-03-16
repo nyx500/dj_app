@@ -4,6 +4,9 @@
     ReverbEffects.cpp
     Created: 14 Mar 2023 9:34:54pm
     Author:  Ophelia
+    Purpose: a GUI component containing the sliders that pass values into
+    the AudioComponent (DJAudioPlayer)'s reverbAudioSource to add reverb
+    effects to the current audio track.
 
   ==============================================================================
 */
@@ -12,13 +15,15 @@
 #include "ReverbEffects.h"
 
 //==============================================================================
+
+/** 
+ *Constructor: takes a pointer to the corresponding DJAudioPlayer in the same DeckGUI
+ *This allows the ReverbEffects to passed straight into the DJAudioPlayer
+*/
 ReverbEffects::ReverbEffects(DJAudioPlayer* _player)
     : player(_player)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
-    // Add and set listeners/ranges/values for all reverb parameter sliders
+    // Add and set listeners/ranges/values for all the reverb parameter sliders
 
     // Reverb "Room Size" slider
     addAndMakeVisible(roomSizeSlider);
@@ -97,27 +102,30 @@ ReverbEffects::ReverbEffects(DJAudioPlayer* _player)
     resetParamsButton.addListener(this);
 }
 
+/** Destructor */
 ReverbEffects::~ReverbEffects()
 {
 }
 
+/**
+ *The paint() method gets called when a region of a component needs redrawing,
+ *either because the component's repaint() method has been called, or because something
+ *has happened on the screen that means a section of a window needs to be redrawn.
+*/
 void ReverbEffects::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll (juce::Colour());   // clear the background
+    // No background
+    g.fillAll(juce::Colour());
 
 }
 
+/**
+ *Called when this component's size has been changed
+ *Draws the different reverb effect sliders
+*/
 void ReverbEffects::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
+    // Splits the component horizontally into 7 columns with one for each slider
     double colW = getWidth() / 7;
     roomSizeLabel.setBounds(0, 0, colW, getHeight() * 0.1);
     roomSizeSlider.setBounds(0, getHeight() * 0.1, colW, getHeight() * 0.7);
@@ -131,17 +139,21 @@ void ReverbEffects::resized()
     reverbWidthSlider.setBounds(colW * 4, getHeight() * 0.1, colW, getHeight() * 0.7);
     freezeModeLabel.setBounds(colW * 5, 0, colW, getHeight() * 0.1);
     freezeModeSlider.setBounds(colW * 5, getHeight() * 0.1, colW, getHeight() * 0.7);
+
+    // At the bottom of all the sliders, set the restore to defaults button
     resetParamsButton.setBounds(0, getHeight() * 0.9, getWidth() * 0.9, getHeight() * 0.1);
 }
 
 
-/** Implements the button listener by overriding the inherited buttonClicked method*/
+/**
+ *Implements the button listener by overriding the inherited buttonClicked method
+ *Resets the reverb parameters to default ones
+*/
 void ReverbEffects::buttonClicked(juce::Button* button)
 {
     if (button == &resetParamsButton)
     {   
         player->resetReverbParamsToDefault();
-        // Reset the slider values
         roomSizeSlider.setValue(0.5);
         dampingSlider.setValue(0.5);
         wetLevelSlider.setValue(0.33);
@@ -151,7 +163,10 @@ void ReverbEffects::buttonClicked(juce::Button* button)
     }
 }
 
-/**Implement the slider listener by overriding the inherited sliderValueChanged method*/
+/**
+ *Implements the slider listener by overriding the inherited sliderValueChanged method
+ * Passes different Reverb effects into the audio source with the stored "player" ptr
+*/
 void ReverbEffects::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &roomSizeSlider)

@@ -4,6 +4,9 @@
     ReverbEffects.h
     Created: 14 Mar 2023 9:34:54pm
     Author:  Ophelia
+    Purpose: a GUI component containing the sliders that pass values into
+    the AudioComponent (DJAudioPlayer)'s reverbAudioSource to add reverb
+    effects to the current audio track.
 
   ==============================================================================
 */
@@ -21,16 +24,39 @@ class ReverbEffects  : public juce::Component,
     public juce::Slider::Listener
 {
 public:
+
+    /**
+     *Constructor: takes a pointer to the corresponding DJAudioPlayer in the same DeckGUI
+     *This allows the ReverbEffects to passed straight into the DJAudioPlayer
+    */
     ReverbEffects(DJAudioPlayer* _player);
+
+    /** Destructor */
     ~ReverbEffects() override;
 
-    /** Implements the button listener by overriding the inherited buttonClicked method*/
+    /** 
+     *Implements the button listener by overriding the inherited buttonClicked method
+     *Resets the reverb parameters to default ones
+    */
     void buttonClicked(juce::Button* button) override;
 
-    /**Implement the slider listener by overriding the inherited sliderValueChanged method*/
+    /** 
+     *Implements the slider listener by overriding the inherited sliderValueChanged method
+     * Passes different Reverb effects into the audio source with the stored "player" ptr
+    */
     void sliderValueChanged(juce::Slider* slider) override;
 
+    /**
+     *The paint() method gets called when a region of a component needs redrawing,
+     *either because the component's repaint() method has been called, or because something
+     *has happened on the screen that means a section of a window needs to be redrawn.
+    */
     void paint (juce::Graphics&) override;
+
+    /** 
+     *Called when this component's size has been changed 
+     *Draws the different reverb effect sliders
+    */
     void resized() override;
 
 private:
