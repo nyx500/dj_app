@@ -24,7 +24,9 @@ class PlaylistComponent : public juce::Component,
 public:
     PlaylistComponent(
         DeckGUI* _gui1,
-        DeckGUI* _gui2
+        DeckGUI* _gui2,
+        // Pass in the font from Main Component,
+        juce::Font _techFont
     );
 
     ~PlaylistComponent() override;
@@ -148,6 +150,10 @@ private:
     juce::File d2ButtonImageFile = juce::File::getCurrentWorkingDirectory().getChildFile("D2.png");
     // Converts the file with the "D2" icon to a juce Image format
     juce::Image d2Icon = juce::PNGImageFormat::loadFrom(d2ButtonImageFile);
+
+
+    // Custom font
+    juce::Font techFont;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PlaylistComponent)
 };

@@ -2,10 +2,12 @@
 #include "PlaylistComponent.h"
 
 //==============================================================================
-PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
+PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2, juce::Font _techFont) :
     gui1(_gui1),
-    gui2(_gui2)
+    gui2(_gui2),
+    techFont(_techFont)
 {
+
     // Initialize the CSVHelper member (creates/loads a CSV file loading the track data from disk)
     csvHelper = CSVHelper();
 
@@ -22,12 +24,14 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     tableComponent.getHeader().addColumn("Title", 1, 120, 100, getParentWidth() /3);
     // Add Column for track duration
     tableComponent.getHeader().addColumn("Length", 2, 80, 60, getParentWidth() / 5);
-    // Column storing Remove buttons
-    tableComponent.getHeader().addColumn("", 3, 50);
     // Play in DeckGUI1 button column
-    tableComponent.getHeader().addColumn("", 4, 50);
+    tableComponent.getHeader().addColumn("", 3, 50);
     // Play in DeckGUI2 button column
+    tableComponent.getHeader().addColumn("", 4, 50);
+    // Column storing Remove buttons
     tableComponent.getHeader().addColumn("", 5, 50);
+    tableComponent.setColour(juce::TableListBox::ColourIds::backgroundColourId, juce::Colours::black);
+    tableComponent.setColour(juce::TableListBox::ColourIds::outlineColourId, juce::Colours::white);
 
     // Adds the data (model) to the tableComponent
     // This class inherits from this, so this .: IS the model
@@ -44,7 +48,7 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     // Search box label
     addAndMakeVisible(searchBoxLabel);
     searchBoxLabel.setJustificationType(juce::Justification::topLeft);
-    searchBoxLabel.setText("Press the Return/Enter key to submit the search term:", juce::dontSendNotification);
+    searchBoxLabel.setText("Press 'Enter' to submit the search term:", juce::dontSendNotification);
     // Adds functionality/listeners for search text input box
     addAndMakeVisible(searchBox);
     searchBox.addListener(this);
@@ -53,8 +57,14 @@ PlaylistComponent::PlaylistComponent(DeckGUI* _gui1, DeckGUI* _gui2) :
     // Restrict invalid input (for security programming purposes): no strings over 100 chars allowed
     // Avoid C++ buffer overflow
     searchBox.setInputRestrictions(100, {});
+    searchBox.setColour(juce::TextEditor::ColourIds::backgroundColourId, juce::Colour(1, 2, 28));
+    searchBox.setColour(juce::TextEditor::ColourIds::outlineColourId, juce::Colours::white);
+    searchBox.setColour(juce::TextEditor::ColourIds::focusedOutlineColourId, juce::Colours::blue);
+    searchBox.setHasFocusOutline(true);
     // Add the button to clear the search
     addAndMakeVisible(clearButton);
+    clearButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour(14, 135, 250));
+    clearButton.setColour(juce::TextButton::ColourIds::textColourOffId, juce::Colours::black);
     clearButton.addListener(this);
 
 
@@ -70,6 +80,8 @@ PlaylistComponent::~PlaylistComponent()
     // Clear the tracks vectors
     tracks.clear();
     tracksToDisplay.clear();
+    // Attribution: FIXES MEMORY LEAK IN DEBUGGER ON SHUTDOWN https://forum.juce.com/t/issue-with-tablelistbox-and-accessibility/53866
+    tableComponent.setModel(nullptr);
 }
 
 void PlaylistComponent::paint(juce::Graphics& g)
@@ -83,19 +95,20 @@ void PlaylistComponent::paint(juce::Graphics& g)
     g.drawRect(getLocalBounds());
 
     g.setColour(juce::Colours::white);
-    g.setFont(30.0f);
-    g.drawText("Music Library", getWidth() * 0.1, 0, getWidth(), getHeight() * 0.1, juce::Justification::left, true);
+    g.setFont(techFont);
+    g.setFont(28.0f);
+    g.drawText("Music Library", getWidth() * 0.1, getHeight() * 0.03, getWidth(), getHeight() * 0.3, juce::Justification::topLeft, true);
 }
 
 void PlaylistComponent::resized()
 {
     // This method is where you should set the bounds of any child
     // components that your component contains..
-    searchBoxLabel.setBounds(0, getHeight() * 0.12, getWidth(), getHeight() * 0.08);
+    searchBoxLabel.setBounds(getWidth() * 0.05, getHeight() * 0.12, getWidth(), getHeight() * 0.08);
     searchBox.setBounds(getWidth() * 0.05, getHeight() * 0.20, getWidth() * 0.9, getHeight() * 0.05);
     clearButton.setBounds(getWidth() * 0.1, getHeight() * 0.28, getWidth() * 0.8, getHeight() * 0.05);
     addButton.setBounds(getWidth() * 0.78, getHeight() * 0.35, getWidth() * 0.15, getHeight() * 0.15);
-    tableComponent.setBounds(0, getHeight() * 0.5, getWidth(), getHeight() * 0.5);
+    tableComponent.setBounds(getWidth() * 0.02, getHeight() * 0.5, getWidth() * 0.96, getHeight() * 0.48);
 }
 
 int PlaylistComponent::getNumRows()
@@ -114,11 +127,20 @@ void PlaylistComponent::paintRowBackground(juce::Graphics& g,
     // "selected" is when user clicks
     if (rowIsSelected)
     {
-        g.fillAll(juce::Colours::orange);
+        g.fillAll(juce::Colours::red);
     }
     else
-    {
-        g.fillAll(juce::Colours::darkgrey);
+    {   
+        if (rowNumber % 2 == 0)
+        {
+            g.fillAll(juce::Colours::darkblue);
+        }
+        else
+        {   
+            // Even darker blue, almost black
+            g.fillAll(juce::Colour(1, 2, 28));
+        }
+       
     }
 }
 
@@ -133,6 +155,9 @@ void PlaylistComponent::paintCell(juce::Graphics& g,
     // Documentation: 
     // void 	drawText (const String &text, int x, int y, int width, int height, Justification justificationType, bool useEllipsesIfTooBig=true) const
     // Draws a line of text within a specified rectangle.
+
+    // White text
+    g.setColour(juce::Colours::white);
 
     if (columnId == 1)
     {
@@ -163,28 +188,6 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
         // If pointer to existingComponent is a nullptr (no component has been created yet)
         if (existingComponentToUpdate == nullptr)
         {
-            // Button to delete the track
-            // Create the component
-            juce::ImageButton* btn = new juce::ImageButton{ "Delete" };
-
-            btn->setImages(true, true, true, deleteIcon, 1.0, juce::Colour(), juce::Image(), 0.5, juce::Colour(255, 255, 255), juce::Image(), 1.0, juce::Colour(255, 255, 255), 0.0f);
-
-            // Make the button id rowNumber:columnId, so for row 4, column 3, will be string 4:3
-            juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId) };
-            btn->setComponentID(id);
-
-            // Add listener to the delete buttons
-            btn->addListener(this);
-            existingComponentToUpdate = btn;
-        }
-    }
-
-    // If the columnId is that for the play button (equals 2)
-    if (columnId == 4)
-    {
-        // If pointer to existingComponent is a nullptr (no component has been created yet)
-        if (existingComponentToUpdate == nullptr)
-        {
             // Create the component
             juce::ImageButton* btn = new juce::ImageButton{ "Load into Deck 1" };
             btn->setImages(true, true, true, d1Icon, 1.0, juce::Colour(), juce::Image(), 0.5, juce::Colour(255, 255, 255), juce::Image(), 1.0, juce::Colour(255, 255, 255), 0.0f);
@@ -199,7 +202,7 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
     }
 
     // If the columnId is that for the play button (equals 2)
-    if (columnId == 5)
+    if (columnId == 4)
     {
         // If pointer to existingComponent is a nullptr (no component has been created yet)
         if (existingComponentToUpdate == nullptr)
@@ -212,6 +215,30 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
             juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId) };
             btn->setComponentID(id);
 
+            btn->addListener(this);
+            existingComponentToUpdate = btn;
+        }
+
+    }
+
+    // If the columnId is that for the play button (equals 2)
+    if (columnId == 5)
+    {
+        
+        // If pointer to existingComponent is a nullptr (no component has been created yet)
+        if (existingComponentToUpdate == nullptr)
+        {
+            // Button to delete the track
+            // Create the component
+            juce::ImageButton* btn = new juce::ImageButton{ "Delete" };
+
+            btn->setImages(true, true, true, deleteIcon, 1.0, juce::Colour(), juce::Image(), 0.5, juce::Colour(255, 255, 255), juce::Image(), 1.0, juce::Colour(255, 255, 255), 0.0f);
+
+            // Make the button id rowNumber:columnId, so for row 4, column 3, will be string 4:3
+            juce::String id{ std::to_string(rowNumber) + ":" + std::to_string(columnId) };
+            btn->setComponentID(id);
+
+            // Add listener to the delete buttons
             btn->addListener(this);
             existingComponentToUpdate = btn;
         }
@@ -322,10 +349,21 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
         // Delete the corresponding track
         if (columnId == 3)
         {
+            gui1->loadTrack(tracksToDisplay[trackIndex].getUrl());
+
+        }
+
+        // Convert column/deckGui id to int and load url into that GUI's DJAudioPlayer
+        if (columnId == 4)
+        {
+            gui2->loadTrack(tracksToDisplay[trackIndex].getUrl());
+        }
+        else if (columnId == 5)
+        {
+
             // IMPORTANT-->
             // Attribution to deleting C++ vector elements: https://www.tutorialspoint.com/cplusplus-program-to-remove-items-from-a-given-vector
-            // Attribution 2:
-            // https://stackoverflow.com/questions/4442477/remove-ith-item-from-a-c-stdvector
+            // Attribution 2: https://iq.opengenus.org/ways-to-remove-elements-from-vector-cpp/
             tracksToDisplay.erase(tracksToDisplay.begin() + (trackIndex));
             // Also erase the track from the hidden track store (tracks which are not currently displayed)
             tracks.erase(tracks.begin() + (trackIndex));
@@ -336,17 +374,6 @@ void PlaylistComponent::buttonClicked(juce::Button* button)
             // Attribution: https://forum.juce.com/t/tablelistboxmodel-and-repaint/4915/2
             tableComponent.updateContent();
             tableComponent.repaint();
-        }
-
-        // Convert column/deckGui id to int and load url into that GUI's DJAudioPlayer
-        if (columnId == 4)
-        {
-            int trackIndex = std::stoi(trackId);
-            gui1->loadTrack(tracksToDisplay[trackIndex].getUrl());
-        }
-        else if (columnId == 5)
-        {
-            gui2->loadTrack(tracksToDisplay[trackIndex].getUrl());
         }
     }
 

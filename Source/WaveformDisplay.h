@@ -11,7 +11,8 @@ class WaveformDisplay : public juce::Component, // This inherits from general JU
 public:
     WaveformDisplay(
         juce::AudioFormatManager& formatManagerToUse,
-        juce::AudioThumbnailCache& cacheToUse
+        juce::AudioThumbnailCache& cacheToUse,
+        juce::Font _techFont
     );
     ~WaveformDisplay() override;
 
@@ -46,6 +47,9 @@ private:
 
     /** Converts time in seconds to time in mins and seconds as a string */
     std::string displayTimeAsString(double timeInSeconds);
+
+    // Custom font
+    juce::Font techFont;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformDisplay)
 };

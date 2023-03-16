@@ -76,7 +76,7 @@ void Track::determineIfShouldDisplay(const juce::String& searchInput)
 
     // Logic to check whether the track's title/extension match the user's search input
     if (juce::String(title).toLowerCase().contains(stringRefSearchInput)
-        || juce::String(extensionName).toLowerCase().contains(stringRefSearchInput)
+        || juce::String(duration).toLowerCase().contains(stringRefSearchInput)
     )
     {   
 

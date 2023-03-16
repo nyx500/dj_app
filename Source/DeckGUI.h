@@ -21,7 +21,8 @@ public:
         DJAudioPlayer* _player,
         juce::AudioFormatManager& formatManagerToUse, // Pass in these args from mainComponent to use the data in the AudioThumbnail
         juce::AudioThumbnailCache& cacheToUse,
-        std::string _deckTitle
+        std::string _deckTitle,
+        juce::Font _techFont
     );
     ~DeckGUI() override;
 
@@ -88,6 +89,9 @@ private:
 
     // Deck number/name
     std::string deckTitle;
+
+    // Custom font
+    juce::Font techFont;
 
     // A macro which handles memory leaks
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DeckGUI)

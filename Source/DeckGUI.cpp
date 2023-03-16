@@ -6,10 +6,12 @@ DeckGUI::DeckGUI(
     DJAudioPlayer* _player,
     juce::AudioFormatManager& formatManagerToUse,
     juce::AudioThumbnailCache& cacheToUse,
-    std::string _deckTitle
+    std::string _deckTitle,
+    juce::Font _techFont
 ) : player(_player), // Sets the player pointer up
-waveformDisplay(formatManagerToUse, cacheToUse),
-deckTitle(_deckTitle)
+waveformDisplay(formatManagerToUse, cacheToUse, _techFont),
+deckTitle(_deckTitle),
+techFont(_techFont)
 {   
     // Resize the play/pause icons stored as juce::Image data members
     playImage = playImage.rescaled(80, 80, juce::Graphics::mediumResamplingQuality);
@@ -30,14 +32,17 @@ deckTitle(_deckTitle)
     volSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour());
     volSlider.setColour(juce::Slider::trackColourId, juce::Colours::white);
     volSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, getParentWidth() * 0.5, getParentHeight() * 2);
+    volSlider.setTextBoxIsEditable(true);
     addAndMakeVisible(speedSlider);
     speedSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour());
     speedSlider.setColour(juce::Slider::trackColourId, juce::Colours::white);
     speedSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, getParentWidth() * 0.5, getParentHeight() * 2);
+    speedSlider.setTextBoxIsEditable(true);
     addAndMakeVisible(posSlider);
     posSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour());
     posSlider.setColour(juce::Slider::trackColourId, juce::Colours::white);
     posSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, getParentWidth() * 0.5, getParentHeight() * 2);
+    posSlider.setTextBoxIsEditable(true);
 
     addAndMakeVisible(volLabel);
     addAndMakeVisible(speedLabel);
@@ -105,9 +110,10 @@ void DeckGUI::paint(juce::Graphics& g)
     g.setColour(juce::Colours::white);
     g.drawRoundedRectangle(0, 0, getWidth(), getHeight(), 10.0, 4.0);
 
-    g.setColour(juce::Colours::white);
-    g.setFont(20.0);
-    g.drawText(juce::String(deckTitle), getWidth() * 0.05, getHeight() * 0.81, getWidth(), getHeight() * 0.2, juce::Justification::left, true);
+    g.setColour(juce::Colour(14, 135, 250));
+    g.setFont(40.0);
+    g.setFont(techFont);
+    g.drawSingleLineText(juce::String(deckTitle), getWidth() * 0.05, getHeight() * 0.96, juce::Justification::left);
 }
 
 void DeckGUI::resized()
@@ -188,6 +194,7 @@ void DeckGUI::filesDropped(const juce::StringArray& files, int x, int y)
 void DeckGUI::timerCallback()
 {
     waveformDisplay.setPositionRelative(player->getPositionRelative());
+    volSlider.setValue(player->getGain());
 }
 
 

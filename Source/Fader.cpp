@@ -30,9 +30,9 @@ Fader::Fader(DJAudioPlayer* _player) :
     fadeSpeedSlider.setValue(0.002);
     fadeSpeedSlider.setSliderStyle(juce::Slider::Rotary);
 
-    // Set fade in buttons to blue
-    fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour(14, 135, 250));
-    fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour(14, 135, 250));
+    // Initially set fader buttons to darkgrey --> bright blue when 'on', dark grey when 'off'
+    fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
+    fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
     // Set stop button to red
     stopFadeButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::red);
 
@@ -92,7 +92,7 @@ void Fader::buttonClicked(juce::Button* button)
     {   
         player->autoFadeIn();
         // Changes colour of the button to "on" button colour
-        fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::deeppink);
+        fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour(14, 135, 250));
         fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
 
     }
@@ -101,7 +101,7 @@ void Fader::buttonClicked(juce::Button* button)
     {
         player->autoFadeOut();
         // Change colour of the button to "on" button colour
-        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::deeppink);
+        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour(14, 135, 250));
         fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
 
     }

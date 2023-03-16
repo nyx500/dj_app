@@ -7,6 +7,8 @@
 //==============================================================================
 MainComponent::MainComponent()
 {
+   
+
     // Make sure you set the size of the component after
     // you add any child components.
     setSize(800, 600);
@@ -32,11 +34,6 @@ MainComponent::MainComponent()
     addAndMakeVisible(playlistComponent);
 
     formatManager.registerBasicFormats();
-
-    // Set up the custom font
-    // Attribution: https://forum.juce.com/t/modern-custom-font-guide/20841/3
-    auto typeface = juce::Typeface::createSystemTypefaceFor(BinaryData::RobotInvaders_ttf, BinaryData::RobotInvaders_ttfSize);
-    techFont = juce::Font(typeface);
 }
 
 MainComponent::~MainComponent()
@@ -90,7 +87,7 @@ void MainComponent::paint(juce::Graphics& g)
     int ptBottomRightY = ptBottomRight.getY();
     float ptBottomRightYFloat = (float)ptBottomRightY;
 
-    juce::ColourGradient gradient(juce::Colours::black, ptTopLeftXFloat, ptTopLeftYFloat, juce::Colours::navy, ptBottomRightXFloat, ptBottomRightYFloat, true);
+    juce::ColourGradient gradient(juce::Colours::black, ptTopLeftXFloat, ptTopLeftYFloat, juce::Colours::blue, ptBottomRightXFloat, ptBottomRightYFloat, true);
     g.setGradientFill(gradient);
     juce::Rectangle background(0, 0, getWidth(), getHeight());
     g.fillRect(background);
@@ -107,7 +104,7 @@ void MainComponent::resized()
 {   
     playlistComponent.setBounds(getWidth() * 0.01, getHeight() * 0.08, getWidth() * 0.4, getHeight() * 0.9);
 
-    deckGUI1.setBounds(getWidth() * 0.42, getHeight() * 0.08, getWidth() * 0.57, getHeight() * 0.42);
-    deckGUI2.setBounds(getWidth() * 0.42, getHeight() * 0.52, getWidth() * 0.57, getHeight() * 0.42);
+    deckGUI1.setBounds(getWidth() * 0.42, getHeight() * 0.08, getWidth() * 0.57, getHeight() * 0.43);
+    deckGUI2.setBounds(getWidth() * 0.42, getHeight() * 0.55, getWidth() * 0.57, getHeight() * 0.43);
 
 }

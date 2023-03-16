@@ -5,7 +5,8 @@
 //==============================================================================
 WaveformDisplay::WaveformDisplay(
     juce::AudioFormatManager& formatManagerToUse,
-    juce::AudioThumbnailCache& cacheToUse
+    juce::AudioThumbnailCache& cacheToUse,
+    juce::Font _techFont
 ) :
     // First argument (sourceSamplesPerThumbnailSample): use 1000 points to plot the waveform  
     // (an audio file has millions of points) -->
@@ -18,7 +19,8 @@ WaveformDisplay::WaveformDisplay(
     audioThumbPlayed(1000, formatManagerToUse, cacheToUse),
     fileLoaded(false), // default value for fileLoaded has to be set to "false"
     position(0),
-    trackLength(0)
+    trackLength(0),
+    techFont(_techFont)
 {
     // Register the ChangeListener with the audioThumbnail so it draws automatically
     audioThumb.addChangeListener(this);
@@ -98,6 +100,7 @@ void WaveformDisplay::paint(juce::Graphics& g)
     {
         g.setColour(juce::Colours::blue);
         g.setFont(20.0f); // make the font bigger (original = 14.0f)
+        g.setFont(techFont);
         g.drawText("File not loaded...", getLocalBounds(),
             juce::Justification::centred, true);   // draw some placeholder text
 

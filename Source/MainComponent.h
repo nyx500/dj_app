@@ -43,19 +43,20 @@ private:
     // once the number has been exceeded
     juce::AudioThumbnailCache thumbCache{ 100 };
 
+    juce::MixerAudioSource mixerSource;
+
+    // Set up the custom font
+    // Attribution: https://forum.juce.com/t/modern-custom-font-guide/20841/3
+    juce::Font techFont = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::RobotInvaders_ttf, BinaryData::RobotInvaders_ttfSize));
+
     // Pass in the formatManager (a reference!!!) into the DJAudioPlayers
     DJAudioPlayer player1{ formatManager };
     // Pass in the data components into the DeckGUI instances
-    DeckGUI deckGUI1{ &player1, formatManager, thumbCache, "D1"};
+    DeckGUI deckGUI1{ &player1, formatManager, thumbCache, "D1", techFont };
     DJAudioPlayer player2{ formatManager };
-    DeckGUI deckGUI2{ &player2, formatManager, thumbCache, "D2"};
+    DeckGUI deckGUI2{ &player2, formatManager, thumbCache, "D2", techFont };
 
-    juce::MixerAudioSource mixerSource;
-
-    PlaylistComponent playlistComponent{&deckGUI1, &deckGUI2};
-
-    // Custom font
-    juce::Font techFont;
+    PlaylistComponent playlistComponent{ &deckGUI1, &deckGUI2, techFont };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
