@@ -14,7 +14,8 @@ class DeckGUI : public juce::Component,
     public juce::Timer
 {
 public:
-    /** Constructor: takes in a pointer to one of the DJAudioPlayer instances in MainComponent, the MainComponent's
+    /** 
+     *Constructor: takes in a pointer to one of the DJAudioPlayer instances in MainComponent, the MainComponent's
      * single formatManager, the thumbnail cache, the title of the DeckGUI to print as text on this component, and
      * the custom tech font by reference
     */
