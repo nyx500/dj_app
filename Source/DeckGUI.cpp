@@ -2,31 +2,35 @@
 #include "DeckGUI.h"
 
 //==============================================================================
+
+/** Constructor: takes in a pointer to one of the DJAudioPlayer instances in MainComponent, the MainComponent's
+    * single formatManager, the thumbnail cache, the title of the DeckGUI to print as text on this component, and
+    * the custom tech font by reference
+*/
 DeckGUI::DeckGUI(
     DJAudioPlayer* _player,
     juce::AudioFormatManager& formatManagerToUse,
     juce::AudioThumbnailCache& cacheToUse,
     std::string _deckTitle,
-    juce::Font& _techFont
-) : player(_player), // Sets the player pointer up
-waveformDisplay(formatManagerToUse, cacheToUse, _techFont),
-deckTitle(_deckTitle),
-techFont(_techFont)
-{   
+    juce::Font& _techFont) : 
+        player(_player),
+        waveformDisplay(formatManagerToUse, cacheToUse, _techFont),
+        deckTitle(_deckTitle),
+        techFont(_techFont)
+{
     // Resize the play/pause icons stored as juce::Image data members
     playImage = playImage.rescaled(80, 80, juce::Graphics::mediumResamplingQuality);
     pauseImage = pauseImage.rescaled(80, 80, juce::Graphics::mediumResamplingQuality);
-
 
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
 
     // Add icons
     playButton.setImages(true, true, true, playImage, 1.0, juce::Colour(), juce::Image(), 0.7, juce::Colour(255, 255, 255), juce::Image(), 1.0, juce::Colour(255, 255, 255), 0.0f);
-    stopButton.setImages(true, true, true, pauseImage, 1.0, juce::Colour(), juce::Image(), 0.7, juce::Colour(255, 255, 255), juce::Image(), 1.0, juce::Colour(255, 255, 255), 0.0f);
+    pauseButton.setImages(true, true, true, pauseImage, 1.0, juce::Colour(), juce::Image(), 0.7, juce::Colour(255, 255, 255), juce::Image(), 1.0, juce::Colour(255, 255, 255), 0.0f);
 
     addAndMakeVisible(playButton);
-    addAndMakeVisible(stopButton);
+    addAndMakeVisible(pauseButton);
 
     addAndMakeVisible(volSlider);
     volSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colour());
@@ -56,7 +60,6 @@ techFont(_techFont)
     speedLabel.setJustificationType(juce::Justification::centred);
     posLabel.setJustificationType(juce::Justification::centred);
 
-
     //// Add the Waveform component
     addAndMakeVisible(waveformDisplay);
     // Add the Fader component
@@ -66,7 +69,7 @@ techFont(_techFont)
 
     // Add the Deck GUI as a listener to its own buttons
     playButton.addListener(this);
-    stopButton.addListener(this);
+    pauseButton.addListener(this);
     volSlider.addListener(this);
     speedSlider.addListener(this);
     posSlider.addListener(this);
@@ -82,7 +85,6 @@ techFont(_techFont)
 
     // Argument: how often to call the timerCallback function
     startTimer(10); //'100' means 100 milliseconds (tenth of a a second)
-
 }
 
 DeckGUI::~DeckGUI()
@@ -123,32 +125,28 @@ void DeckGUI::resized()
     double rowH = getHeight() / 7;
     // Put play and stop buttons next to each other
     playButton.setBounds(getWidth() * 0.05, rowH * 0.25, getWidth() * 0.1, rowH);
-    stopButton.setBounds(getWidth() * 0.18, rowH * 0.25, getWidth() * 0.1, rowH);
+    pauseButton.setBounds(getWidth() * 0.18, rowH * 0.25, getWidth() * 0.1, rowH);
     waveformDisplay.setBounds(getWidth() * 0.3, rowH * 0.25, getWidth() * 0.68, rowH);
     fader.setBounds(getWidth() * 0.02, rowH * 1.5, getWidth() * 0.3, rowH * 5);
     volSlider.setBounds(getWidth() * 0.34, rowH * 1.5, getWidth() * 0.2, rowH * 0.8);
-    volLabel.setBounds(getWidth() * 0.34, rowH * 2.3, getWidth() * 0.2, rowH/2);
+    volLabel.setBounds(getWidth() * 0.34, rowH * 2.3, getWidth() * 0.2, rowH / 2);
     speedSlider.setBounds(getWidth() * 0.34, rowH * 3.5, getWidth() * 0.2, rowH * 0.8);
-    speedLabel.setBounds(getWidth() * 0.34, rowH * 4.3, getWidth() * 0.2, rowH/2);
+    speedLabel.setBounds(getWidth() * 0.34, rowH * 4.3, getWidth() * 0.2, rowH / 2);
     posSlider.setBounds(getWidth() * 0.34, rowH * 5.4, getWidth() * 0.2, rowH);
     posLabel.setBounds(getWidth() * 0.34, rowH * 6.3, getWidth() * 0.2, rowH / 2);
     reverbEffects.setBounds(getWidth() * 0.54, rowH * 1.5, getWidth() * 0.47, getHeight() - rowH * 1.6);
 }
-
 
 /** Implement button listener */
 void DeckGUI::buttonClicked(juce::Button* button)
 {
     if (button == &playButton)
     {
-        std::cout << "Play button was clicked " << std::endl;
         player->play();
     }
-    if (button == &stopButton)
+    if (button == &pauseButton)
     {
-        std::cout << "Stop button was clicked " << std::endl;
         player->stop();
-
     }
 }
 
@@ -156,7 +154,7 @@ void DeckGUI::sliderValueChanged(juce::Slider* slider)
 {
 
     if (slider == &volSlider)
-    {   
+    {
         player->setGain(slider->getValue());
     }
 
@@ -171,8 +169,6 @@ void DeckGUI::sliderValueChanged(juce::Slider* slider)
     }
 }
 
-
-
 // Drag and drop functions
 bool DeckGUI::isInterestedInFileDrag(const juce::StringArray& files)
 {
@@ -181,7 +177,7 @@ bool DeckGUI::isInterestedInFileDrag(const juce::StringArray& files)
 
 void DeckGUI::filesDropped(const juce::StringArray& files, int x, int y)
 {
-    //DBG("DeckGUI::filesDropped");
+    // DBG("DeckGUI::filesDropped");
 
     // Only want one file
     if (files.size() == 1)
@@ -197,21 +193,20 @@ void DeckGUI::timerCallback()
     volSlider.setValue(player->getGain());
 }
 
-
 /** A file URL is passed in from the Playlist Component and loaded into the DJAudioplayer */
 void DeckGUI::loadTrack(juce::URL chosenFile)
 {
     //// this does work in 6.1 but the syntax is quite counter-intuitive
     //   // Link: https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
     //   // - configure the dialogue
-    //auto fileChooserFlags =
+    // auto fileChooserFlags =
     //    juce::FileBrowserComponent::canSelectFiles;
     //// - launch out of the main thread
     //// - note how we use a lambda function which you've probably
-    //// not seen before. Please do not worry too much about that. 
-    //fChooser.launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser)
-    //    {
-    //        auto chosenFile = chooser.getResult();
+    //// not seen before. Please do not worry too much about that.
+    // fChooser.launchAsync(fileChooserFlags, [this](const juce::FileChooser& chooser)
+    //     {
+    //         auto chosenFile = chooser.getResult();
 
     //        // Gets the filename as a Juce String
     //        juce::String fileNameAsJuceString = chosenFile.getFileName();
@@ -225,7 +220,7 @@ void DeckGUI::loadTrack(juce::URL chosenFile)
     //        waveformDisplay.loadURL(juce::URL{ chosenFile });
     //        waveformDisplay.setTrackLengthInSeconds(player->getTrackLengthInSeconds());
     //    });
-     /* Loads URL into the player using the loadURL method */
+    /* Loads URL into the player using the loadURL method */
     player->loadURL(chosenFile);
     /** Does the same on the waveformDisplay, except it's not a pointer */
     waveformDisplay.loadURL(chosenFile);
