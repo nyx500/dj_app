@@ -4,7 +4,7 @@
     CSVHelper.h
     Created: 2 Mar 2023 7:52:15pm
     Author:  Ophelia
-
+    Purpose: A set of helper methods to help read and write "Track" data from a CSV
   ==============================================================================
 */
 
@@ -14,43 +14,42 @@
 #include <string>
 #include <vector>
 
-class CSVHelper {
-
-    // Constructor: takes the path to the CSV as argument
+class CSVHelper
+{
 public:
+    /** Either opens or creates a CSV trackData file when CSVHelper is instantiated */
     CSVHelper();
 
-
-    /** Creates the CSV file to store track data if doesn't already exist,
-     * and stores the file path in the private filePath property
+    /** 
+     *Creates the CSV file to store the track data if doesn't already exist.
+     *Stores the file path to the track data in this class's private 
+     "filePath" property
     */
     void getAndStoreCSVFile();
 
     /**
-        * Writes in the data for the tracks into the CSV File
-        * Pass in the track vector by reference for efficiency
+     * Writes the track data into the CSV File.
     */
     void writeTracksDataIntoCSVFile(std::vector<Track>& tracks);
 
     /**
-    * Reads rows (1 track --> 1 row) from CSV file and outputs a
-    * vector of tracks (purpose: to store in the PlaylistComponent)
-    */
+     * Reads rows (1 track per row) from the trackdata CSV file and
+     * outputs a vector of tracks to store in the Playlist
+     */
     std::vector<Track> readTracksDataFromCSVFile();
 
 private:
-
     /**
-      * Converts a track into a comma-separated format as a juce::String data type
+     * Converts a track into a comma-separated juce::String
     */
     juce::String trackToCSV(Track& track);
 
     /**
-        * Converts a CSV line into a track object
+     * Converts a CSV line/row into a "Track" object to store in the
+     * "Tracks" vector in the Playlist
     */
     Track CSVToTrack(juce::StringRef& csvLine);
 
-    // Stores the absolute path to the CSV File
+    // Stores the absolute path to the trackData CSV File
     juce::String filePath;
-
 };
