@@ -1,35 +1,53 @@
 #pragma once
-#include <../JuceLibraryCode/JuceHeader.h>// Need this header to use Juce library
+#include <../JuceLibraryCode/JuceHeader.h>
 
-// Want this to be an audio source, so inherit from the audio source (has virtual functions to implement)
+// This is an audio source: it inherits from the JUCE AudioSource clas, so it has virtual functions to implement
 class DJAudioPlayer : public juce::AudioSource,
-    // Timer's purpose here: for the "AutoFade" functionality --> checks Boolean variables to see if track should be autofading in/out
+    // Timer: for the "AutoFade" functionality --> checks Boolean variables to see if track should be autofading in or out
     public juce::Timer
 {
 
 public:
-    /** Constructor*/
-    DJAudioPlayer(juce::AudioFormatManager& _formatManager); // Now takes in the program-scope formatManager used in all classes
+
+    /** Constructor: takes in the program-scope formatManager from Main Component*/
+    DJAudioPlayer(juce::AudioFormatManager& _formatManager);
+
     /** /Destructor */
     ~DJAudioPlayer();
 
     //====================Audio Source Virtual Functions Implementation=============
+    /** Tells the audio source to prepare for playing */
     void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
+    /** Called repeatedly to fetch subsequent blocks of audio data */
     void getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill) override;
+    /** Allows the audio source to release anything it no longer needs after playback has stopped. */
     void releaseResources() override;
     //==============================================================================
 
-    // Basic sound altering functions
+    /** Loads in the selected audio file's URL to play the selected audio track and loads up an audio stream from the URL to the transportSource */
     void loadURL(juce::URL audioURL);
+
+    //================================Main Slider Controls==============================================
+    /** Sets the volume of the audio to the double passed in as a parameter*/
     void setGain(double gain);
 
-    /** For the "fade" effect: returns the current volume of the audio*/
+    /** Returns the current volume of the audio track */
     double getGain();
 
+    /** Sets the speed of the audio to the double passed in as a parameter */
     void setSpeed(double ratio);
+
+    /** Sets the position inside the audio track to the double passed in as a parameter */
     void setPosition(double posInSecs);
-    // Relative means between '0 and 1' instead of between 0 and "number of seconds"
+
+    /** 
+     * Sets relative position, meaning a position between '0 and 1', instead of between 0 and "number of seconds".
+     * This is because each track has a different length, so to keep slider the same for all the tracks, make position 0-1.s
+    */
     void setPositionRelative(double pos);
+
+
+    //====================================Reverb Effects applied to ReverbAudioSource instance=============================
     /** Sets the roomSize property of the reverb effect */
     void setReverbRoomSize(double roomSize);
     /** Sets the damping property of the reverb effect */
@@ -45,50 +63,60 @@ public:
     /** Resets reverb parameters to default values */
     void resetReverbParamsToDefault();
 
-
-    /************************SECTION FOR AUTO-FADER FUNCTIONALITY***************************/
-    /** Sets the player's auto-fade speed by getting the slider value from the Fader object */
+    //=====================================Auto-fader Functionality======================================================
+    /** Sets the player's auto-fade speed by getting the Slider value from the Fader object in the DeckGUI */
     void setFadeSpeed(double fadeSpeed);
-    /** Automatically increases ("fades-in") the volume of the audio track at a speed dep. on value of autoFadeSpeed */
+    /** Sets the isFadingIn Boolean private variable to "true" and sets the isFadingOut Boolean to false */
     void autoFadeIn();
-    /** Automatically decreases ("fades-out") the volume of the audio track at a speed dep. on value of autoFadeSpeed */
+    /** Sets the isFadingOut Boolean private variable to "true" and sets the isFadingIn Boolean to false */
     void autoFadeOut();
-    /** Stops any auto-fading that might be going on*/
+    /** Sets both isFadingIn and isFadingOut to false */
     void stopAutoFade();
-    /** Implements juce::Timer's inherited pure virtual function to auto-fade consistently if fade Booleans are on
-     * Checks if booleans (isFadingIn/isFadingOut) are true, and if one is, then it either increases/decreases the volume
-     * of the audio track using the getGain() and setGain() functions
+    /**
+     * Continuously checks if the Fader Booleans (isFadingIn/isFadingOut) are true, and if one is, 
+     * then it either increases/decreases the volume of the audio track using the getGain() and setGain() functions
     */
     void timerCallback() override;
 
-    // Basic stopping and starting functions
-    /** Start playing the file */
+
+    //=====================================Basic Playback======================================================
+    /** Starts playing the file */
     void play();
-    /** Stop playing the file */
+    /** Stops playing the file */
     void stop();
 
     /** Gets the relative position of the playhead*/
     double getPositionRelative();
 
-    /** Get the length of the track in seconds to pass into the WaveformDisplay to display position in seconds */
+    /** Gets the length of the track in seconds to pass into the WaveformDisplay to display position in seconds */
     double getTrackLengthInSeconds();
 
 private:
 
-    // Need a global AudioFormatManager instead (Week 18) --> type should be reference
+    // The reference to the audio format manager passed in from MainComponent 
     juce::AudioFormatManager& formatManager;
 
-    std::unique_ptr <juce::AudioFormatReaderSource> readerSource;
+    // Reader for the data stream from the audio file being played
+    std::unique_ptr<juce::AudioFormatReaderSource> readerSource;
+    
+    // The three transport sources to play (transportSource) and manipulate (resample, reverb) the audio
     juce::AudioTransportSource transportSource;
     juce::ResamplingAudioSource resampleSource{ &transportSource, false, 2 };
-    /* An AudioSource that uses the Reverb class to apply a reverb to another AudioSource. */
-    juce::ReverbAudioSource reverbAudioSource{ &resampleSource, false};
+    /* This is a type of AudioSource used to apply a reverb effect to another AudioSource. */
+    juce::ReverbAudioSource reverbAudioSource{ &resampleSource, false };
+
+    // Stores if the audio is being played
     bool playing = false;
 
-    /********************************FADER FUNCTIONALITY*************************************/
-    /* Stores the speed to auto fade-in/fade-out with the Fader object */
+
+    //======================================Fader Data===================================================================
+    // Variables storing the speed of the fade, as well as Booleans keeping track of whether to fade the track at 
+    // the present moment
+
+    /* This stores the speed to auto fade-in/fade-out with the slider in the Fader object */
     double autoFadeSpeed;
-    // Default values of bools: neither fading in or fading out, both have to be false on startup
+
+    // Default values of Booleans: as neither fading in or fading out on startup, "false" is the starting value
     double isFadingIn{ false };
     double isFadingOut{ false };
 };

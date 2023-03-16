@@ -1,13 +1,13 @@
 #include <../JuceLibraryCode/JuceHeader.h>
 #include "DJAudioPlayer.h"
 
-/** Constructor*/
-DJAudioPlayer::DJAudioPlayer(juce::AudioFormatManager& _formatManager) :
-    formatManager(_formatManager)
-{   
+/** Constructor: takes in the program-scope formatManager from Main Component*/
+DJAudioPlayer::DJAudioPlayer(juce::AudioFormatManager& _formatManager) : formatManager(_formatManager)
+{
+    // Set up the reverb parameters
     juce::Reverb::Parameters params{};
-
-    // List of default reverb parameters
+    // Sets the reverb parameters to the defaults listed in the JUCE class reference
+    // Attribution: https://docs.juce.com/master/structReverb_1_1Parameters.html
     params.roomSize = 0.5f;
     params.damping = 0.5f;
     params.wetLevel = 0.33f;
@@ -16,54 +16,60 @@ DJAudioPlayer::DJAudioPlayer(juce::AudioFormatManager& _formatManager) :
     params.freezeMode = 0.0f;
     reverbAudioSource.setParameters(params);
 
-    // Argument: how often to call the timerCallback function
-    startTimer(10); //'10' = 10 milliseconds (hundredth of a a second)
+    // Call timerCallback every 10 milliseconds (one hundredth of a second)
+    startTimer(10);
 }
+
 /** /Destructor */
 DJAudioPlayer::~DJAudioPlayer()
 {
-
 }
 
 //====================Audio Source Virtual Functions Implementation=============
+
 // Birth
+/** Tells the audio source to prepare for playing */
 void DJAudioPlayer::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
 {
     transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);  
+    resampleSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
+    // Reverb Audio Source for reverb effects, takes in the resampleSource, which takes in transportSource
     reverbAudioSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
 }
 
 // Life
+/** Called repeatedly to fetch subsequent blocks of audio data */
 void DJAudioPlayer::getNextAudioBlock(const juce::AudioSourceChannelInfo& bufferToFill)
-{
-
+{   
+    // If no more data to get,or audio is paused, then clears the audio buffer
     if (readerSource.get() == nullptr || !playing)
     {
         bufferToFill.clearActiveBufferRegion();
         return;
     }
 
-    //resampleSource.getNextAudioBlock(bufferToFill);
     // Delegate responsibility to the reverbAudioSource which takes in the resampleSource as a parameter when created
     reverbAudioSource.getNextAudioBlock(bufferToFill);
 }
 
 // Death
+/** Allows the audio source to release anything it no longer needs after playback has stopped. */
 void DJAudioPlayer::releaseResources()
-{
+{   
+    // Releases resources from all the three audio sources
     transportSource.releaseResources();
     resampleSource.releaseResources();
     reverbAudioSource.releaseResources();
 }
 //==============================================================================
 
-// Basic sound altering functions
+/** Loads in the selected audio file's URL to play the selected audio track and loads up an audio stream from the URL to the transportSource */
 void DJAudioPlayer::loadURL(juce::URL audioURL)
-{
+{   
+    // Attribution: complex syntax borrowed from the lecture videos to get data stream from the audio file URL into the transportSource
     auto* reader = formatManager.createReaderFor(audioURL.createInputStream(false));
 
-    if (reader != nullptr) // good file!
+    if (reader != nullptr) // Good file!
     {
         std::unique_ptr<juce::AudioFormatReaderSource> newSource(new juce::AudioFormatReaderSource(reader,
             true));
@@ -72,9 +78,11 @@ void DJAudioPlayer::loadURL(juce::URL audioURL)
     }
 }
 
+//================================Main Slider Controls==============================================
+/** Sets the volume of the audio to the double passed in as a parameter*/
 void DJAudioPlayer::setGain(double gain)
 {
-    // Make sure volume is between the bounds of 0.0 and 1.0
+    // Makes sure volume is constrained between the bounds of 0.0 and 1.0
     if (getGain() < 0)
     {
         transportSource.setGain(0.0);
@@ -89,31 +97,40 @@ void DJAudioPlayer::setGain(double gain)
     }
 }
 
-/** For the "fade" effect: returns the current volume of the audio*/
+
+/** Returns the current volume of the audio track */
 double DJAudioPlayer::getGain()
 {
-   return transportSource.getGain();
+    return transportSource.getGain();
 }
 
 
+/** Sets the speed of the audio to the double passed in as a parameter */
 void DJAudioPlayer::setSpeed(double ratio)
-{
+{   
+    // Print out a DBG error message if the speed value is invalid (below 0 or over 100)
     if (ratio < 0 || ratio > 100.0)
     {
         DBG("DJAudioPlayer::setSpeed - Ratio should be between 0 and 100!");
     }
     else
-    {
+    {   
+        // Speed can only be changed on resampleSource and not the audio transportSource!
         resampleSource.setResamplingRatio(ratio);
     }
 }
 
+
+/** Sets the position inside the audio track to the double passed in as a parameter */
 void DJAudioPlayer::setPosition(double posInSecs)
 {
     transportSource.setPosition(posInSecs);
 }
 
-
+/**
+ * Sets relative position, meaning a position between '0 and 1', instead of between 0 and "number of seconds".
+ * This is because each track has a different length, so to keep slider the same for all the tracks, make position 0-1.s
+*/
 void DJAudioPlayer::setPositionRelative(double pos)
 {
     if (pos < 0 || pos > 1.0)
@@ -128,13 +145,11 @@ void DJAudioPlayer::setPositionRelative(double pos)
 }
 
 
-// Set the roomSize parameter for the reverb effect
+//====================================Reverb Effects applied to ReverbAudioSource instance=============================
+/** Sets the roomSize parameter of the reverb effect */
 void DJAudioPlayer::setReverbRoomSize(double roomSize)
-{   
-    DBG("calling DJAudioPlayer::setReverbRoomSize");
-    DBG(std::to_string(roomSize));
+{
     juce::Reverb::Parameters params = reverbAudioSource.getParameters();
-
     params.roomSize = roomSize;
     reverbAudioSource.setParameters(params);
 }
@@ -142,50 +157,40 @@ void DJAudioPlayer::setReverbRoomSize(double roomSize)
 /** Sets the damping property of the reverb effect */
 void DJAudioPlayer::setReverbDamping(double dampingLevel)
 {
-    DBG("calling DJAudioPlayer::setReverbDamping");
-    DBG(std::to_string(dampingLevel));
     juce::Reverb::Parameters params = reverbAudioSource.getParameters();
-
     params.damping = dampingLevel;
     reverbAudioSource.setParameters(params);
 }
+
 /** Sets the "wet level" property of the reverb effect */
 void DJAudioPlayer::setReverbWetLevel(double wetLevel)
 {
-    DBG("calling DJAudioPlayer::setReverbWetLevel");
-    DBG(std::to_string(wetLevel));
     juce::Reverb::Parameters params = reverbAudioSource.getParameters();
-
     params.wetLevel = wetLevel;
     reverbAudioSource.setParameters(params);
 }
+
 /** Sets the "dry level" property of the reverb effect */
 void DJAudioPlayer::setReverbDryLevel(double dryLevel)
 {
-    DBG("calling DJAudioPlayer::setReverbDryLevel");
-    DBG(std::to_string(dryLevel));
     juce::Reverb::Parameters params = reverbAudioSource.getParameters();
-
     params.roomSize = dryLevel;
     reverbAudioSource.setParameters(params);
 }
+
+
 /** Sets the "width" property of the reverb effect */
 void DJAudioPlayer::setReverbWidth(double width)
 {
-    DBG("calling DJAudioPlayer::setReverbWidth");
-    DBG(std::to_string(width));
     juce::Reverb::Parameters params = reverbAudioSource.getParameters();
-
     params.width = width;
     reverbAudioSource.setParameters(params);
 }
+
 /** Set the FreezeMode (looping) property of the reverb effect */
 void DJAudioPlayer::setReverbFreezeMode(double freezeLevel)
 {
-    DBG("calling DJAudioPlayer::setReverbFreezeMode");
-    DBG(std::to_string(freezeLevel));
     juce::Reverb::Parameters params = reverbAudioSource.getParameters();
-
     params.freezeMode = freezeLevel;
     reverbAudioSource.setParameters(params);
 }
@@ -202,59 +207,67 @@ void DJAudioPlayer::resetReverbParamsToDefault()
     params.width = 1.0f;
     params.freezeMode = 0.0f;
     reverbAudioSource.setParameters(params);
-
 }
 
-/*****************************AUTO-FADE FUNCTIONALITY****************************************/
-/** Sets the player's auto-fade speed by getting the slider value from the Fader object */
+
+//=====================================Auto-fader Functionality===================================================
+
+/** Sets the player's auto-fade speed by getting the Slider value from the Fader object in the DeckGUI */
 void DJAudioPlayer::setFadeSpeed(double fadeSpeed)
 {
     autoFadeSpeed = fadeSpeed;
 }
-/** Automatically increases ("fades-in") the volume of the audio track at a speed dep. on value of autoFadeSpeed */
+
+/** Sets the isFadingIn Boolean private variable to "true" and sets the isFadingOut Boolean to false */
 void DJAudioPlayer::autoFadeIn()
-{   
-    // If player is not fading in, set this value to true
+{
+    // If player is not fading in, then set this value to true
     if (!isFadingIn)
     {
         isFadingIn = true;
-        // Set isFadingOut to false when fadingIn is pressed
+
+        // Set isFadingOut to false when fadeIn button is pressed
         isFadingOut = false;
     }
 }
-/** Automatically decreases ("fades-out") the volume of the audio track at a speed dep. on value of autoFadeSpeed */
+
+
+/** Sets the isFadingOut Boolean private variable to "true" and sets the isFadingIn Boolean to false */
 void DJAudioPlayer::autoFadeOut()
 {
-    // If player is not fading out, set this value to true
+    // If player is not fading out, then set this value to true
     if (!isFadingOut)
     {
         isFadingOut = true;
-        // Set isFadingIn to false when fadingOut is pressed
+
+        // Set isFadingIn to false when fadeOut button is pressed
         isFadingIn = false;
     }
 }
-/** Stops any auto-fading that might be going on*/
+
+/** Sets both isFadingIn and isFadingOut to false */
 void DJAudioPlayer::stopAutoFade()
-{   
+{
     isFadingIn = false;
     isFadingOut = false;
 }
 
-
-/** Implements juce::Timer's inherited pure virtual function to auto-fade consistently if fade Booleans are on
-     * Checks if booleans (isFadingIn/isFadingOut) are true, and if one is, then it either increases/decreases the volume
-     * of the audio track using the getGain() and setGain() functions
+/** 
+ *Continuously checks if the Fader Booleans (isFadingIn/isFadingOut) are true, and if one is,
+ *then it either increases/decreases the volume of the audio track using the getGain() and setGain() functions
 */
 void DJAudioPlayer::timerCallback()
-{
+{   
+    // Gets the audio's current volume
+    double currentVol = getGain();
+
+    // If the private member variable called "isFadingIn" has been set to TRUE, then increase the volume
     if (isFadingIn)
-    {   
-        DBG("DJAudioPlayer::timerCallback - isFadingIn");
-        double currentVolume = getGain();
-        DBG(std::to_string(currentVolume));
-        if (currentVolume < 1.0)
+    {
+        // Only increase the volume when fading in up to 1.0
+        if (currentVol < 1.0)
         {
-            setGain(currentVolume += autoFadeSpeed);
+            setGain(currentVol += autoFadeSpeed);
         }
         else
         {
@@ -262,30 +275,33 @@ void DJAudioPlayer::timerCallback()
         }
     }
 
-    if (isFadingOut)
-    {
 
-        DBG("DJAudioPlayer::timerCallback - isFadingOut");
-        double currentVolume = getGain();
-        DBG(std::to_string(currentVolume));
-        if (currentVolume > 0.0)
+    // If the private member variable called "isFadingOut" has been set to TRUE, then increase the volume
+    if (isFadingOut)
+    {   
+        // Only decrease the volume when fading out down to 0.0
+        if (currentVol > 0.0)
         {
-            setGain(currentVolume -= autoFadeSpeed);
+            setGain(currentVol -= autoFadeSpeed);
         }
         else
         {
             setGain(0.0);
         }
     }
+    
 }
-/*****************************END OF AUTO-FADE FUNCTIONALITY****************************************/
 
-// Basic sound stopping and starting functions
+
+//=====================================Basic Playback======================================================
+  /** Starts playing the file */
 void DJAudioPlayer::play()
 {
     playing = true;
     transportSource.start();
 }
+
+/** Stops playing the file */
 void DJAudioPlayer::stop()
 {
     playing = false;
@@ -293,15 +309,14 @@ void DJAudioPlayer::stop()
 }
 
 
+/** Gets the relative position of the playhead */
 double DJAudioPlayer::getPositionRelative()
 {
-    // .getCurrentPosition only returns the position back in seconds
-    // BUT we need a relative (0 to 1) position...
+    // .getCurrentPosition only returns the position back in seconds, so calculates a ratio between 0-1 through dividing by total length
     return transportSource.getCurrentPosition() / transportSource.getLengthInSeconds();
 }
 
-
-/** Get the length of the track in seconds to pass into the WaveformDisplay to display position in seconds */
+/** Gets the length of the track in seconds to pass into the WaveformDisplay to display the position in seconds */
 double DJAudioPlayer::getTrackLengthInSeconds()
 {
     return transportSource.getLengthInSeconds();
