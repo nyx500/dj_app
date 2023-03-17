@@ -1,11 +1,11 @@
 /*
-  ==============================================================================
+  =======================================================================================
 
-    CSVHelper.cpp
+    CSVHelper.h
     Created: 2 Mar 2023 7:52:15pm
     Author:  Ophelia
-    Purpose: A set of helper methods to help read and write "Track" data from a CSV
-  ==============================================================================
+    Purpose: A set of helper methods to help read and write "Track" data from a CSV file
+  =======================================================================================
 */
 
 #include "CSVHelper.h"

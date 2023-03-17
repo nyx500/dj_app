@@ -221,7 +221,7 @@ void DeckGUI::loadTrack(juce::URL chosenFile)
     // Attribution: https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
     // Loads the audio track URL into the player using it loadURL method
     player->loadURL(chosenFile);
-
+    
     // Loads the audio track data into the waveform display instance
     waveformDisplay.loadURL(chosenFile);
 

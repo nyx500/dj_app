@@ -72,7 +72,6 @@ private:
     juce::Label speedLabel;
     juce::Label posLabel;
 
-    // Attribution: File Choose object to select audio file from local disk https://docs.juce.com/master/classFileChooser.html#ac888983e4abdd8401ba7d6124ae64ff3
     juce::FileChooser fChooser{ "Select a file..." };
 
     // Pointer to a DJAudioPlayer to transmit information received from button/slider listeners into the player

@@ -66,7 +66,6 @@ void DJAudioPlayer::releaseResources()
 /** Loads in the selected audio file's URL to play the selected audio track and loads up an audio stream from the URL to the transportSource */
 void DJAudioPlayer::loadURL(juce::URL audioURL)
 {   
-    // Attribution: complex syntax borrowed from the lecture videos to get data stream from the audio file URL into the transportSource
     auto* reader = formatManager.createReaderFor(audioURL.createInputStream(false));
 
     if (reader != nullptr) // Good file!

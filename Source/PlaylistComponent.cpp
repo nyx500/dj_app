@@ -168,6 +168,7 @@ void PlaylistComponent::paintRowBackground(juce::Graphics& g,
         // When tracks are not being clicked on ("selected") paint every other track darkest blue and some a lighter blue
         if (rowNumber % 2 == 0)
         {
+            // A richer, brighter blue
             g.fillAll(juce::Colours::darkblue);
         }
         else
@@ -481,6 +482,7 @@ void PlaylistComponent::addNewTrack()
             if (auto reader = formatManager.createReaderFor(chosenFile))
             {
                 double lengthInSeconds = reader->lengthInSamples / reader->sampleRate;
+
                 // Call the custom-made convertTimeInSecondsToString() function to get the duration as HH:MM:SS
                 trackLengthInHHMMSSFormat = convertTimeInSecondsToString(lengthInSeconds);
 
