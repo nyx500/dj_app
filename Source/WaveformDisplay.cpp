@@ -6,16 +6,11 @@
 WaveformDisplay::WaveformDisplay(
     juce::AudioFormatManager& formatManagerToUse,
     juce::AudioThumbnailCache& cacheToUse,
-    juce::Font& _techFont
-) :
-    // First argument (sourceSamplesPerThumbnailSample): use 1000 points to plot the waveform  
-    // (an audio file has millions of points) -->
-    // this is called "downsampling".
-    // This is a measure of the resolution of the
-    // image.Let’s say we wanted one - second resolution, i.e.the image plots one
-    // value for every second of audio.We would pass in the sample rate for this
-    // parameter.The lower the value, the higher the resolution.
-    audioThumb(1000, formatManagerToUse, cacheToUse), // Second and third params: pass by reference
+    juce::Font& _techFont) : // First argument (sourceSamplesPerThumbnailSample): use 1000 points to plot the waveform
+    // (an audio file has millions of points) --> "downsampling"
+    // This is a measure of the resolution of the image.
+    // The lower the value, the higher the resolution.
+    audioThumb(1000, formatManagerToUse, cacheToUse),
     audioThumbPlayed(1000, formatManagerToUse, cacheToUse),
     fileLoaded(false), // default value for fileLoaded has to be set to "false"
     position(0),
@@ -31,21 +26,19 @@ WaveformDisplay::~WaveformDisplay()
 {
 }
 
+/**
+ *The paint() method gets called when a region of a component needs redrawing,
+ *either because the component's repaint() method has been called, or because something
+ *has happened on the screen that means a section of a window needs to be redrawn
+ */
 void WaveformDisplay::paint(juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
     // Set black background
     g.fillAll(juce::Colours::black);
 
     // Outline component in blue
     g.setColour(juce::Colours::blue);
-    g.drawRect(getLocalBounds(), 1.0);  // draw an outline around the component
+    g.drawRect(getLocalBounds(), 1.0); // draw an outline around the component
 
     g.setColour(juce::Colours::white);
     // Draw the waveform/audio thumb only if the file has loaded successfully
@@ -58,60 +51,41 @@ void WaveformDisplay::paint(juce::Graphics& g)
         audioThumb.drawChannel(
             g,
             getLocalBounds(),
-            0, // Start time of audio files
-            audioThumb.getTotalLength(), // End of audio file (total length) in seconds
-            0, // Channel number (left-channel --> don't need to draw both channels)
-            0.8 // "Vertical-zoom factor" --> boosts up the sound if it's really quiet. If 1 = fills up the whole container.
+            0,                           // Start time of the audio file
+            audioThumb.getTotalLength(), // End of audio file (i.e. total length in seconds)
+            0,                           // Channel number
+            0.8                          // "Vertical-zoom factor" --> boosts up the sound if it's really quiet. If 1 = fills up the whole container.
 
         );
 
+        // Set semi-opaque rectangle over section of audio thumbnail that has already been played to demonstrate the progress
         juce::Rectangle playedSectionRect = juce::Rectangle((int)(getWidth() * 0.1), (int)(getHeight() * 0.1), (int)(position * getWidth()), getHeight());
-
         g.setColour(juce::Colours::black.withAlpha(0.5f));
         g.fillRect(0, 0, position * getWidth(), getHeight());
 
-
-        // Alternative way to do position colour change (but the thumbnail is constantly being rescaled, not good)
-        //g.setColour(juce::Colours::grey);
-        //g.drawRect(0, 0, position * getWidth(), getHeight());
-
-
-        //g.setColour(juce::Colours::cornflowerblue);
-        //audioThumbPlayed.drawChannel(
-        //    g,
-        //    playedSectionRect,
-        //    0, // Start time of audio files
-        //    timeInSeconds, // End of audio file (total length) in seconds
-        //    0, // Channel number (left-channel --> don't need to draw both channels)
-        //    0.5 // "Vertical-zoom factor" --> boosts up the sound if it's really quiet. If 1 = fills up the whole container.
-        //);
-        //
         // Draws the playhead on the waveform in blue
         g.setColour(juce::Colours::blue);
 
         g.fillRect(getWidth() * position, 0, 3, getHeight());
 
+        // Text stating how many minutes/seconds have elapseds
         g.setFont(20.0f);
-
         double timeInSeconds = position * trackLength;
         g.drawText(displayTimeAsString(timeInSeconds), 0, 0, 100, 100, 9, true);
     }
     else // File is not loaded
     {
         g.setColour(juce::Colours::blue);
-        g.setFont(20.0f); // make the font bigger (original = 14.0f)
+        g.setFont(20.0f);
         g.setFont(techFont);
         g.drawText("File not loaded...", getLocalBounds(),
-            juce::Justification::centred, true);   // draw some placeholder text
-
+            juce::Justification::centred, true); // Draw some placeholder message when file not loaded
     }
 }
 
+/** Called when this component's size has been changed */
 void WaveformDisplay::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-
 }
 
 /* Loads the URL selected by the user into the thumbnail as well as into the audio player*/
@@ -123,15 +97,13 @@ void WaveformDisplay::loadURL(juce::URL audioURL)
     audioThumbPlayed.clear();
 
     /**Passes the audioURL into the audioThumb for the display.
-       * We need to "unpack" the URL and turn it into an
-       * input source and call setSource on the thumbnail.
-       * This function returns "true" if audioURL stream actually loads.
-    */
+     * We need to "unpack" the URL and turn it into an
+     * input source and call setSource on the thumbnail.
+     * This function returns "true" if audioURL stream actually loads.
+     */
     fileLoaded = audioThumb.setSource(new juce::URLInputSource(audioURL)); // Class-scope variable
     fileLoaded = audioThumbPlayed.setSource(new juce::URLInputSource(audioURL));
-
 }
-
 
 /**Virtual method inherited from ChangeListener to implement automatic waveform drawing*/
 void WaveformDisplay::changeListenerCallback(juce::ChangeBroadcaster* source)
@@ -139,7 +111,6 @@ void WaveformDisplay::changeListenerCallback(juce::ChangeBroadcaster* source)
     // Calls the paint() method again
     repaint();
 }
-
 
 /** Sets the relative position of the playhead */
 void WaveformDisplay::setPositionRelative(double pos)
@@ -159,8 +130,6 @@ void WaveformDisplay::setPositionRelative(double pos)
         position = pos;
         repaint();
     }
-
-
 }
 
 /** Sets the length of the track in seconds */
@@ -168,7 +137,6 @@ void WaveformDisplay::setTrackLengthInSeconds(double length)
 {
     trackLength = length;
 }
-
 
 /** Converts time in seconds to time in mins and seconds as a string */
 std::string WaveformDisplay::displayTimeAsString(double timeInSeconds)

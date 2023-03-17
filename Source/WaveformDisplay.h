@@ -4,19 +4,25 @@
 
 //==============================================================================
 /*
-*/
-class WaveformDisplay : public juce::Component, // This inherits from general JUCE Component class
+ */
+class WaveformDisplay : public juce::Component,     // This inherits from general JUCE Component class
     public juce::ChangeListener // For the AudioThumbnail to draw automatically when a file is loaded
 {
 public:
     WaveformDisplay(
         juce::AudioFormatManager& formatManagerToUse,
         juce::AudioThumbnailCache& cacheToUse,
-        juce::Font& _techFont
-    );
+        juce::Font& _techFont);
     ~WaveformDisplay() override;
 
+    /**
+     *The paint() method gets called when a region of a component needs redrawing,
+     *either because the component's repaint() method has been called, or because something
+     *has happened on the screen that means a section of a window needs to be redrawn
+     */
     void paint(juce::Graphics&) override;
+
+    /** Called when this component's size has been changed */
     void resized() override;
 
     /* Loads the URL selected by the user into the thumbnail as well as into the audio player*/
@@ -32,10 +38,10 @@ public:
     void setTrackLengthInSeconds(double length);
 
 private:
-    // Create the AudioThumbnail class instance for the whole track
+    // Creates the AudioThumbnail class instance for the whole track
     juce::AudioThumbnail audioThumb;
 
-    // Create the AudioThumbnail for the played area
+    // Creates the AudioThumbnail for the played area
     juce::AudioThumbnail audioThumbPlayed;
 
     // Checks if the file has successfully loaded
@@ -45,7 +51,7 @@ private:
 
     double trackLength;
 
-    /** Converts time in seconds to time in mins and seconds as a string */
+    /** Converts the time in seconds to time in minute and seconds as a string */
     std::string displayTimeAsString(double timeInSeconds);
 
     // Custom font

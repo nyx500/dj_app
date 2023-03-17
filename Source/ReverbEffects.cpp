@@ -16,10 +16,10 @@
 
 //==============================================================================
 
-/** 
+/**
  *Constructor: takes a pointer to the corresponding DJAudioPlayer in the same DeckGUI
  *This allows the ReverbEffects to passed straight into the DJAudioPlayer
-*/
+ */
 ReverbEffects::ReverbEffects(DJAudioPlayer* _player)
     : player(_player)
 {
@@ -77,7 +77,7 @@ ReverbEffects::ReverbEffects(DJAudioPlayer* _player)
     addAndMakeVisible(reverbWidthSlider);
     addAndMakeVisible(reverbWidthLabel);
     reverbWidthSlider.addListener(this);
-    reverbWidthSlider.setRange(0.0, 1.0);   
+    reverbWidthSlider.setRange(0.0, 1.0);
     reverbWidthSlider.setValue(1.0);
     reverbWidthSlider.setSliderStyle(juce::Slider::LinearVertical);
     reverbWidthSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, getParentWidth(), 30);
@@ -111,18 +111,17 @@ ReverbEffects::~ReverbEffects()
  *The paint() method gets called when a region of a component needs redrawing,
  *either because the component's repaint() method has been called, or because something
  *has happened on the screen that means a section of a window needs to be redrawn.
-*/
-void ReverbEffects::paint (juce::Graphics& g)
+ */
+void ReverbEffects::paint(juce::Graphics& g)
 {
     // No background
     g.fillAll(juce::Colour());
-
 }
 
 /**
  *Called when this component's size has been changed
  *Draws the different reverb effect sliders
-*/
+ */
 void ReverbEffects::resized()
 {
     // Splits the component horizontally into 7 columns with one for each slider
@@ -144,15 +143,14 @@ void ReverbEffects::resized()
     resetParamsButton.setBounds(0, getHeight() * 0.9, getWidth() * 0.9, getHeight() * 0.1);
 }
 
-
 /**
  *Implements the button listener by overriding the inherited buttonClicked method
  *Resets the reverb parameters to default ones
-*/
+ */
 void ReverbEffects::buttonClicked(juce::Button* button)
 {
     if (button == &resetParamsButton)
-    {   
+    {
         player->resetReverbParamsToDefault();
         roomSizeSlider.setValue(0.5);
         dampingSlider.setValue(0.5);
@@ -166,7 +164,7 @@ void ReverbEffects::buttonClicked(juce::Button* button)
 /**
  *Implements the slider listener by overriding the inherited sliderValueChanged method
  * Passes different Reverb effects into the audio source with the stored "player" ptr
-*/
+ */
 void ReverbEffects::sliderValueChanged(juce::Slider* slider)
 {
     if (slider == &roomSizeSlider)
