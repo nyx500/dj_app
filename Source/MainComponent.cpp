@@ -78,39 +78,41 @@ void MainComponent::paint(juce::Graphics& g)
 {   
     //========Functionality which gets the corners of the Main Component to create a background colourGradient============
     // Gets the whole component's bounds
-    juce::Rectangle bounds = getLocalBounds();
-    // Point class: stores the x and y coords for top-left corner of the main component
-    juce::Point ptTopLeft = bounds.getTopLeft();
-    // Stores the x-coordinate of the top-left corner of the main component
-    int ptTopLeftX = ptTopLeft.getX();
-    // Converts the x-coordinate of the top-left corner to a float, so it can pass as a param to colourGradient
-    float ptTopLeftXFloat = (float)ptTopLeftX;
-    // Stores the y-coordinate of the top-left corner of the main component
-    int ptTopLeftY = ptTopLeft.getY();
-    // Converts the y-coordinate of the top-left corner to a float
-    float ptTopLeftYFloat = (float)ptTopLeftY;
-    // Stores the x and y coords for bottom-right corner of the main component
-    juce::Point ptBottomRight = bounds.getBottomRight();
-    // Stores the x-coordinate of the bottom-right corner of the main component
-    int ptBottomRightX = ptBottomRight.getX();
-    // Converts the x-coordinate of the bottom-right corner to a float
-    float ptBottomRightXFloat = (float)ptBottomRightX;
-    // Stores the y-coordinate of the bottom-right corner of the main component
-    int ptBottomRightY = ptBottomRight.getY();
-    // Converts the y-coordinate of the bottom-right corner to a float
-    float ptBottomRightYFloat = (float)ptBottomRightY;
+    //juce::Rectangle bounds = getLocalBounds();
+    //// Point class: stores the x and y coords for top-left corner of the main component
+    //juce::Point ptTopLeft = bounds.getTopLeft();
+    //// Stores the x-coordinate of the top-left corner of the main component
+    //int ptTopLeftX = ptTopLeft.getX();
+    //// Converts the x-coordinate of the top-left corner to a float, so it can pass as a param to colourGradient
+    //float ptTopLeftXFloat = (float)ptTopLeftX;
+    //// Stores the y-coordinate of the top-left corner of the main component
+    //int ptTopLeftY = ptTopLeft.getY();
+    //// Converts the y-coordinate of the top-left corner to a float
+    //float ptTopLeftYFloat = (float)ptTopLeftY;
+    //// Stores the x and y coords for bottom-right corner of the main component
+    //juce::Point ptBottomRight = bounds.getBottomRight();
+    //// Stores the x-coordinate of the bottom-right corner of the main component
+    //int ptBottomRightX = ptBottomRight.getX();
+    //// Converts the x-coordinate of the bottom-right corner to a float
+    //float ptBottomRightXFloat = (float)ptBottomRightX;
+    //// Stores the y-coordinate of the bottom-right corner of the main component
+    //int ptBottomRightY = ptBottomRight.getY();
+    //// Converts the y-coordinate of the bottom-right corner to a float
+    //float ptBottomRightYFloat = (float)ptBottomRightY;
 
-    // Creates a black-blue ColourGradient object using the coordinates stored above from the Main Component's bounds
-    // This gradient will be used for the Main Component background
-    juce::ColourGradient gradient(juce::Colours::black, ptTopLeftXFloat,
-        ptTopLeftYFloat, juce::Colours::blue, ptBottomRightXFloat,
-        ptBottomRightYFloat, true
-    );
-    // Sets the gradient as the current fill
-    g.setGradientFill(gradient);
-    // Fills a rectangle the size of the whole main component with the gradient fill
-    juce::Rectangle background(0, 0, getWidth(), getHeight());
-    g.fillRect(background);
+    //// Creates a black-blue ColourGradient object using the coordinates stored above from the Main Component's bounds
+    //// This gradient will be used for the Main Component background
+    //juce::ColourGradient gradient(juce::Colours::black, ptTopLeftXFloat,
+    //    ptTopLeftYFloat, juce::Colours::blue, ptBottomRightXFloat,
+    //    ptBottomRightYFloat, true
+    //);
+    //// Sets the gradient as the current fill
+    //g.setGradientFill(gradient);
+    //// Fills a rectangle the size of the whole main component with the gradient fill
+    //juce::Rectangle background(0, 0, getWidth(), getHeight());
+    //g.fillRect(background);
+    
+    g.drawImage(backgroundImg, getLocalBounds().toFloat());
     //=========================================================================================================================
 
     // Sets up the custom Robot Invader font

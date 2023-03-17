@@ -16,6 +16,27 @@
 /** Constructor: takes in a DJAudioPlayer to be able to send fade instructions to audio source*/
 Fader::Fader(DJAudioPlayer* _player) : player(_player)
 {
+    // Sets the size of the the FadeIn/FadeOut/StopFade icons stored as juce::Image data members to 80x80 pixels
+    fadeInImage = fadeInImage.rescaled(100, 80, juce::Graphics::mediumResamplingQuality);
+    fadeOutImage = fadeOutImage.rescaled(100, 80, juce::Graphics::mediumResamplingQuality);
+    stopFadeImage = stopFadeImage.rescaled(100, 100, juce::Graphics::mediumResamplingQuality);
+
+    // Adds the icons to the ImageButtons --> first colour is for normal (not held down) button state (original icon's blue for FadeIn/FadeOut)
+    // Second colour is for when button is hovered over with the mouse (white)
+    // Third colour is for the moment when the button is clicked (red)
+    fadeInButton.setImages(true, true, true, fadeInImage, 1.0, juce::Colour(),
+        juce::Image(), 0.7, juce::Colour(255, 255, 255), juce::Image(),
+        1.0, juce::Colour(255, 0, 0), 0.0f
+    );
+    fadeOutButton.setImages(true, true, true, fadeOutImage, 1.0, juce::Colour(),
+        juce::Image(), 0.7, juce::Colour(255, 255, 255), juce::Image(),
+        1.0, juce::Colour(255, 0, 0), 0.0f
+    );
+    stopFadeButton.setImages(true, true, true, stopFadeImage, 1.0, juce::Colour(),
+        juce::Image(), 0.7, juce::Colour(255, 255, 255), juce::Image(),
+        1.0, juce::Colour(255, 0, 0), 0.0f
+    );
+
     // Add all the fader buttons
     addAndMakeVisible(fadeInButton);
     addAndMakeVisible(fadeOutButton);
@@ -31,6 +52,8 @@ Fader::Fader(DJAudioPlayer* _player) : player(_player)
     fadeSpeedSlider.setValue(0.002);
     // Make the slider round    
     fadeSpeedSlider.setSliderStyle(juce::Slider::Rotary);
+    // Set text box containing number value above the slider
+    fadeSpeedSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 0, 0);
 
     // Initially set fader buttons to darkgrey --> bright blue when 'on', dark grey when 'off'
     fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
@@ -45,7 +68,9 @@ Fader::Fader(DJAudioPlayer* _player) : player(_player)
     fadeSpeedSlider.addListener(this);
 
     // Set the text for the speed slider label
-    labelForFadeSpeedSlider.setText("Fade speed", juce::dontSendNotification);
+    // Justify the label in the center below the slider
+    labelForFadeSpeedSlider.setText("Fade Speed", juce::dontSendNotification);
+    labelForFadeSpeedSlider.setJustificationType(juce::Justification::centred);
     labelForFadeSpeedSlider.setColour(juce::Label::textColourId, juce::Colours::white);
 }
 
@@ -62,7 +87,7 @@ Fader::~Fader()
 void Fader::paint(juce::Graphics& g)
 {   
     // Make background transparent (no background)
-    g.fillAll(juce::Colour());
+    g.fillAll(juce::Colour());  
 }
 
 
@@ -70,12 +95,12 @@ void Fader::paint(juce::Graphics& g)
 void Fader::resized()
 {   
     // Divide the component into five rows then put the buttons/sliders in a column on the left-hand side of the DeckGUI
-    double rowHeight = getHeight() / 5;
-    fadeInButton.setBounds(getWidth() * 0.1, 0, getWidth() * 0.8, rowHeight);
-    fadeOutButton.setBounds(getWidth() * 0.1, rowHeight * 1.1, getWidth() * 0.8, rowHeight);
-    stopFadeButton.setBounds(getWidth() * 0.1, rowHeight * 2.2, getWidth() * 0.8, rowHeight);
-    fadeSpeedSlider.setBounds(getWidth() * 0.05, rowHeight * 3.3, getWidth() * 0.9, rowHeight * 1.4);
-    labelForFadeSpeedSlider.setBounds(getWidth() * 0.45, rowHeight * 4.7, getWidth() * 0.5, rowHeight * 0.3);
+    double rowHeight = getHeight() / 6;
+    fadeInButton.setBounds(0, 0, getWidth(), rowHeight * 0.9);
+    fadeOutButton.setBounds(0, rowHeight * 1.1, getWidth(), rowHeight * 0.9);
+    stopFadeButton.setBounds(0, rowHeight * 2.1, getWidth(), rowHeight * 0.9);
+    fadeSpeedSlider.setBounds(getWidth() * 0.05, rowHeight * 3.1, getWidth() * 0.9, rowHeight * 2);
+    labelForFadeSpeedSlider.setBounds(getWidth() * 0.1, rowHeight * 5.1, getWidth(), rowHeight * 0.9);
 }
 
 /** Implements the pure virtual function that cames with the Button listener which this class inherits from */
@@ -86,30 +111,19 @@ void Fader::buttonClicked(juce::Button* button)
     {   
         // Tells the audio player child component to fade tne music in (increase the volume incrementally)
         player->autoFadeIn();
-        // Change colour of fadeIn (increase volume) button to bright blue
-        fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour(14, 135, 250));
-        // Grey out the inactive fadeOut button
-        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
+
     }
 
     if (button == &fadeOutButton)
     {
-
         // Tells the audio player child component to fade the music out (decrease the volume incrementally)
         player->autoFadeOut();
-        // Change colour of fadeOut (decrease volume) button to bright blue
-        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour(14, 135, 250));
-        // Grey out the inactive fadeOut button
-        fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
     }
 
     if (button == &stopFadeButton)
     {   
         // Tell the audio player child component to stop any fading effects
         player->stopAutoFade();
-        // Grey out both the fader buttons
-        fadeInButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
-        fadeOutButton.setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colours::darkgrey);
     }
 }
 

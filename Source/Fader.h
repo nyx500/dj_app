@@ -44,14 +44,20 @@ public:
 
 private:
 
-    // The button to increase the volume in increments determined by the value on the fadeSpeed slider automatically ("fade in")
-    juce::TextButton fadeInButton{ "Fade In" };
+    // Loads "FadeIn"/"FadeOut"/"StopFading" icons from the Project's "SOURCE" directory
+    juce::File fadeInImageFile = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" }).getChildFile("fadeIn.png");
+    juce::File fadeOutImageFile = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" }).getChildFile("fadeOut.png");
+    juce::File stopFadeImageFile = juce::File::getCurrentWorkingDirectory().getParentDirectory().getParentDirectory().getChildFile(juce::StringRef{ "Source" }).getChildFile("stopFade.png");
 
-    // The button to decrease the volume in increments determined by the value on the fadeSpeed slider automatically ("fade out")
-    juce::TextButton fadeOutButton{ "Fade Out" };
+    // Converts the icons files into a juce Image format
+    juce::Image fadeInImage = juce::PNGImageFormat::loadFrom(fadeInImageFile);
+    juce::Image fadeOutImage = juce::PNGImageFormat::loadFrom(fadeOutImageFile);
+    juce::Image stopFadeImage = juce::PNGImageFormat::loadFrom(stopFadeImageFile);
 
-    // Stops any fading when clicked
-    juce::TextButton stopFadeButton{ "Stop Fade" };
+    // Creates three image buttons for FadeIn/FadeOut/StopFade
+    juce::ImageButton fadeInButton{ "FadeIn" };
+    juce::ImageButton fadeOutButton{ "FadeOut" };
+    juce::ImageButton stopFadeButton{ "StopFade" };
 
     // Slider to determine how fast to fade in / fade out
     juce::Slider fadeSpeedSlider;

@@ -298,6 +298,7 @@ juce::Component* PlaylistComponent::refreshComponentForCell(int rowNumber,
     return existingComponentToUpdate;
 }
 
+
 //=====================================Implementation of Listeners' Virtual Functions============================
 /**
  *Implementation of ButtonListener virtual function which is called when user clicks on a button

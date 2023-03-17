@@ -38,6 +38,11 @@ public:
 private:
     // Your private member variables go here...
 
+    // Background image
+    // Attribution: https://forum.juce.com/t/adding-background-image-october-2019-solved-by-cpr/35569/2
+    juce::Image backgroundImg = juce::ImageCache::getFromMemory(BinaryData::backgroundGradientImage_png,
+                                                                  BinaryData::backgroundGradientImage_pngSize
+                                                                 );
 
     //=============================Audio Functionality=================================================
     

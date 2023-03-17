@@ -156,18 +156,18 @@ void DeckGUI::resized()
     waveformDisplay.setBounds(getWidth() * 0.3, rowH * 0.25, getWidth() * 0.68, rowH);
 
     // Left column underneath Play/Pause buttons and the audio waveform: for the Fader buttons/slider
-    fader.setBounds(getWidth() * 0.02, rowH * 1.5, getWidth() * 0.3, rowH * 5);
+    fader.setBounds(0, rowH * 1.5, getWidth() * 0.25, rowH * 5);
 
     // Center column underneath Play/Pause buttons and the audio waveform: for the volume/speed/position sliders
-    volSlider.setBounds(getWidth() * 0.34, rowH * 1.5, getWidth() * 0.2, rowH * 0.8);
-    volLabel.setBounds(getWidth() * 0.34, rowH * 2.3, getWidth() * 0.2, rowH / 2);
-    speedSlider.setBounds(getWidth() * 0.34, rowH * 3.5, getWidth() * 0.2, rowH * 0.8);
-    speedLabel.setBounds(getWidth() * 0.34, rowH * 4.3, getWidth() * 0.2, rowH / 2);
-    posSlider.setBounds(getWidth() * 0.34, rowH * 5.4, getWidth() * 0.2, rowH);
-    posLabel.setBounds(getWidth() * 0.34, rowH * 6.3, getWidth() * 0.2, rowH / 2);
+    volSlider.setBounds(getWidth() * 0.25, rowH * 1.5, getWidth() * 0.25, rowH * 0.8);
+    volLabel.setBounds(getWidth() * 0.25, rowH * 2.3, getWidth() * 0.25, rowH / 2);
+    speedSlider.setBounds(getWidth() * 0.25, rowH * 3.5, getWidth() * 0.25, rowH * 0.8);
+    speedLabel.setBounds(getWidth() * 0.25, rowH * 4.3, getWidth() * 0.25, rowH / 2);
+    posSlider.setBounds(getWidth() * 0.25, rowH * 5.4, getWidth() * 0.25, rowH);
+    posLabel.setBounds(getWidth() * 0.25, rowH * 6.3, getWidth() * 0.25, rowH / 2);
 
     // Right column underneath Play/Pause buttons and the audio waveform: for the Reverb Effects sliders
-    reverbEffects.setBounds(getWidth() * 0.54, rowH * 1.5, getWidth() * 0.47, getHeight() - rowH * 1.6);
+    reverbEffects.setBounds(getWidth() * 0.5, rowH * 1.5, getWidth() * 0.5, getHeight() - rowH * 1.6);
 }
 
 
@@ -212,6 +212,7 @@ void DeckGUI::timerCallback()
 
     // When the user clicks on Fade In/Fade Out buttons, update the position of the volume slider as the volume increases/decreases
     volSlider.setValue(player->getGain());
+    
 }
 
 /** Passes an audio file's URL from the PlaylistComponent which owns this DeckGUI into the DeckGUI's DJAudioPlayer */

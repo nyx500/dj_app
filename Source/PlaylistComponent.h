@@ -139,7 +139,7 @@ private:
     void addTracksToDisplayToDisplayedVector();
 
     //==================================================Private Data Members====================================================
-    // The TableListBox for storing the track library
+    // The TableListBox for storing the track lsibrary
     juce::TableListBox tableComponent;
 
     // Makes a file chooser in order to add files to the playlist

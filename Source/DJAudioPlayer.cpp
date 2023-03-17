@@ -120,7 +120,6 @@ void DJAudioPlayer::setSpeed(double ratio)
     }
 }
 
-
 /** Sets the position inside the audio track to the double passed in as a parameter */
 void DJAudioPlayer::setPosition(double posInSecs)
 {
@@ -143,7 +142,6 @@ void DJAudioPlayer::setPositionRelative(double pos)
         setPosition(posInSecs);
     }
 }
-
 
 //====================================Reverb Effects applied to ReverbAudioSource instance=============================
 /** Sets the roomSize parameter of the reverb effect */

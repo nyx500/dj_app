@@ -18,6 +18,11 @@
       <FILE id="eRYXuK" name="D2.png" compile="0" resource="1" file="Source/D2.png"/>
       <FILE id="blurkb" name="D1.png" compile="0" resource="1" file="Source/D1.png"/>
       <FILE id="a4Vn3d" name="ReverbEffects.h" compile="0" resource="0" file="Source/ReverbEffects.h"/>
+      <FILE id="OOFumx" name="stopFade.png" compile="0" resource="1" file="Source/stopFade.png"/>
+      <FILE id="DlqHXw" name="backgroundGradientImage.png" compile="0" resource="1"
+            file="Source/backgroundGradientImage.png"/>
+      <FILE id="BOve3a" name="fadeOut.png" compile="0" resource="1" file="Source/fadeOut.png"/>
+      <FILE id="Z7JpaN" name="fadeIn.png" compile="0" resource="1" file="Source/fadeIn.png"/>
       <FILE id="Uual0S" name="delete.png" compile="0" resource="1" file="Source/delete.png"/>
       <FILE id="xpj5EI" name="Track.cpp" compile="1" resource="0" file="Source/Track.cpp"/>
       <FILE id="ZDNWUr" name="Track.h" compile="0" resource="0" file="Source/Track.h"/>
